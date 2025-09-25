@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Главная — Скидки{% endblock %}
+
+{% block content %}
+<h2>Популярные категории</h2>
+<div class="tags">
+  {% for c in popular_categories %}
+    <a href="#" class="tag">{{ c.name }}</a>
+  {% endfor %}
+</div>
+
+<h2>Топ-скидки</h2>
+<div class="cards">
+  {% for d in top_deals %}
+    <div class="card">
+      {% if d.image_url %}
+        <img src="{% static d.image_url %}" alt="{{ d.title }}">
+      {% else %}
+        <img src="{% static 'images/placeholder.jpg' %}" alt="No image">
+      {% endif %}
+
+      <div class="card-body">
+        <h3>{{ d.title }}</h3>
+        <p>От {{ d.merchant.name }}</p>
+        <p class="price">
+          <span class="old">{{ d.price_original }} ₽</span>
+          <span class="new">{{ d.price_discount }} ₽</span>
+        </p>
+        <a href="#" class="btn">Подробнее</a>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+
+<h2>Все акции</h2>
+<ul class="deal-list">
+  {% for d in ending_soon %}
+    <li>
+      <a href="#">
+        <b>{{ d.title }}</b> — до {{ d.expires_at|date:"d.m.Y" }}
+      </a>
+    </li>
+  {% endfor %}
+</ul>
+{% endblock %}

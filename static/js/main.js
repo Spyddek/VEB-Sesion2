@@ -1,0 +1,1 @@
+console.log('HTML5 UP Massively template adapted for Django');
