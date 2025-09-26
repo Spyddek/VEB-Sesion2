@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Все акции{% endblock %}
+{% block content %}
+
+<style>
+  .card {
+    border: 1px solid #eee;
+    border-radius: 10px;
+    padding: 15px;
+    margin: 10px 0;
+    box-shadow: 0 1px 5px rgba(0,0,0,0.05);
+  }
+  .card h3 {
+    margin-top: 0;
+  }
+  a.btn {
+    color: #fff;
+    background: #007bff;
+    padding: 6px 12px;
+    border-radius: 6px;
+    display: inline-block;
+    margin: 4px 2px;
+  }
+  a.btn:hover {
+    background: #0056b3;
+    color: #fff;
+  }
+  .danger { background: #dc3545; }
+  .danger:hover { background: #a71d2a; }
+  .success { background: #28a745; }
+  .success:hover { background: #1c7c31; }
+</style>
+
+<h1>Все акции</h1>
+
+<p>
+  <a class="btn success" href="{% url 'discounts:deal_create' %}">➕ Добавить акцию</a>
+</p>
+
+{% if deals %}
+  {% for deal in deals %}
+    <div class="card">
+      <h3>
+        <a href="{% url 'discounts:deal_detail' deal.id %}">{{ deal.title }}</a>
+      </h3>
+      <p>
+        <strong>{{ deal.price_discount }} ₽</strong>
+        <span class="muted strike">{{ deal.price_original }} ₽</span>
+        <span class="badge">−{{ deal.discount_percent|floatformat:0 }}%</span>
+      </p>
+      <p class="muted">Действует до {{ deal.expires_at|date:"d.m.Y" }}</p>
+
+      {% if deal.merchant %}
+        <p><strong>Магазин:</strong> {{ deal.merchant.name }}</p>
+      {% endif %}
+      {% if deal.categories.exists %}
+        <p><strong>Категории:</strong>
+          {% for cat in deal.categories.all %}
+            {{ cat.name }}{% if not forloop.last %}, {% endif %}
+          {% endfor %}
+        </p>
+      {% endif %}
+
+      <p>
+        <a class="btn" href="{% url 'discounts:deal_update' deal.id %}">✏️ Редактировать</a>
+        <a class="btn danger" href="{% url 'discounts:deal_delete' deal.id %}">🗑 Удалить</a>
+      </p>
+    </div>
+  {% endfor %}
+{% else %}
+  <p>Акций пока нет.</p>
+{% endif %}
+
+{% endblock %}

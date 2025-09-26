@@ -5,6 +5,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login as auth_login
 
 from .models import Deal, Category, Coupon, Merchant
+from .forms import DealForm
 
 
 def home(request):
@@ -123,3 +124,44 @@ def signup(request):
     else:
         form = UserCreationForm()
     return render(request, "signup.html", {"form": form})
+
+
+def deal_create(request):
+    """Добавление новой акции"""
+    if request.method == "POST":
+        form = DealForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect("discounts:deal_list")
+    else:
+        form = DealForm()
+    return render(request, "deal_form.html", {"form": form, "action": "Добавить"})
+
+
+def deal_update(request, pk):
+    """Редактирование акции"""
+    deal = get_object_or_404(Deal, pk=pk)
+    if request.method == "POST":
+        form = DealForm(request.POST, request.FILES, instance=deal)
+        if form.is_valid():
+            form.save()
+            return redirect("discounts:deal_detail", pk=deal.pk)
+    else:
+        form = DealForm(instance=deal)
+    return render(request, "deal_form.html", {"form": form, "action": "Редактировать"})
+
+
+def deal_delete(request, pk):
+    """Удаление акции"""
+    deal = get_object_or_404(Deal, pk=pk)
+    if request.method == "POST":
+        deal.delete()
+        return redirect("discounts:deal_list")
+    return render(request, "deal_confirm_delete.html", {"deal": deal})
+
+def deal_list(request):
+    """Список всех акций"""
+    deals = Deal.objects.select_related("merchant").prefetch_related("categories").all()
+    return render(request, "deal_list.html", {
+        "deals": deals,
+    })

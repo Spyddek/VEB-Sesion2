@@ -5,7 +5,7 @@
 <style>
   a {
     color: #000;
-    text-decoration: none;    /* убираем подчёркивание */
+    text-decoration: none;
   }
   a:visited {
     color: #000;
@@ -18,16 +18,50 @@
     color: #000;
   }
 
-  /* 👇 ссылки-кнопки */
+  /* ссылки-кнопки */
   a.btn {
-    color: #fff;        /* белый текст */
+    color: #fff;
+    background: #007bff;   /* синий фон */
     padding: 6px 12px;
     border-radius: 6px;
     display: inline-block;
+    margin: 4px 2px;
   }
   a.btn:hover {
-    background: #333;   /* подсветка при наведении */
-    color: #fff;        /* остаётся белым */
+    background: #0056b3;
+    color: #fff;
+  }
+
+  .danger {
+    background: #dc3545;   /* красный */
+  }
+  .danger:hover {
+    background: #a71d2a;
+  }
+
+  .success {
+    background: #28a745;   /* зелёный */
+  }
+  .success:hover {
+    background: #1c7c31;
+  }
+
+  .card-wide {
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    max-width: 600px;
+    margin: auto;
+  }
+  .hero {
+    max-width: 100%;
+    border-radius: 10px;
+  }
+  .muted {
+    color: #666;
+  }
+  .strike {
+    text-decoration: line-through;
   }
 </style>
 
@@ -40,17 +74,37 @@
      <span class="muted strike">{{ deal.price_original }} ₽</span></p>
   <p class="muted">Действует до {{ deal.expires_at|date:"d.m.Y" }}</p>
 
+  <!-- 👇 связанные данные -->
+  {% if deal.shop %}
+    <p><strong>Магазин:</strong> {{ deal.shop.name }}</p>
+    <p class="muted">Адрес: {{ deal.shop.address }}</p>
+  {% endif %}
+  {% if deal.category %}
+    <p><strong>Категория:</strong> {{ deal.category.title }}</p>
+  {% endif %}
+  <p><strong>Описание:</strong> {{ deal.description }}</p>
+
+  <!-- 👇 функционал добавления/редактирования/удаления -->
   <p>
     {% if user.is_authenticated %}
       {% if is_fav %}
-        <a class="btn" href="{% url 'discounts:toggle_favorite' deal.id %}">Убрать из избранного</a>
+        <a class="btn success" href="{% url 'discounts:toggle_favorite' deal.id %}">Убрать из избранного</a>
       {% else %}
-        <a class="btn" href="{% url 'discounts:toggle_favorite' deal.id %}">☆ В избранное</a>
+        <a class="btn success" href="{% url 'discounts:toggle_favorite' deal.id %}">☆ В избранное</a>
       {% endif %}
       <a class="btn" href="{% url 'discounts:my_favorites' %}">Мои избранные</a>
     {% else %}
       <a class="btn" href="{% url 'login' %}">Войдите, чтобы добавить в избранное</a>
     {% endif %}
   </p>
+
+  <hr>
+  <p>
+    <a class="btn" href="{% url 'discounts:deal_update' deal.id %}">✏️ Редактировать</a>
+    <a class="btn danger" href="{% url 'discounts:deal_delete' deal.id %}">🗑 Удалить</a>
+    <a class="btn success" href="{% url 'discounts:deal_create' %}">➕ Добавить новую акцию</a>
+  </p>
+  <p><a href="{% url 'discounts:deal_list' %}">← Вернуться ко всем акциям</a></p>
 </article>
+
 {% endblock %}
