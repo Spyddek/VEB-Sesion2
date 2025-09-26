@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}{{ deal.title }} — Акция{% endblock %}
+{% block content %}
+
+<style>
+  a {
+    color: #000;
+    text-decoration: none;    /* убираем подчёркивание */
+  }
+  a:visited {
+    color: #000;
+  }
+  a:hover {
+    color: #333;
+  }
+  a:active, a:focus {
+    outline: none;
+    color: #000;
+  }
+
+  /* 👇 ссылки-кнопки */
+  a.btn {
+    color: #fff;        /* белый текст */
+    padding: 6px 12px;
+    border-radius: 6px;
+    display: inline-block;
+  }
+  a.btn:hover {
+    background: #333;   /* подсветка при наведении */
+    color: #fff;        /* остаётся белым */
+  }
+</style>
+
+
+<article class="card card-wide">
+  <img class="hero" src="{{ deal.image_url|default:'/static/images/placeholder.jpg' }}" alt="">
+  <h2>{{ deal.title }}</h2>
+  <p><span class="badge">−{{ deal.discount_pct|floatformat:0 }}%</span>
+     <strong>{{ deal.price_discount }} ₽</strong>
+     <span class="muted strike">{{ deal.price_original }} ₽</span></p>
+  <p class="muted">Действует до {{ deal.expires_at|date:"d.m.Y" }}</p>
+
+  <p>
+    {% if user.is_authenticated %}
+      {% if is_fav %}
+        <a class="btn" href="{% url 'discounts:toggle_favorite' deal.id %}">Убрать из избранного</a>
+      {% else %}
+        <a class="btn" href="{% url 'discounts:toggle_favorite' deal.id %}">☆ В избранное</a>
+      {% endif %}
+      <a class="btn" href="{% url 'discounts:my_favorites' %}">Мои избранные</a>
+    {% else %}
+      <a class="btn" href="{% url 'login' %}">Войдите, чтобы добавить в избранное</a>
+    {% endif %}
+  </p>
+</article>
+{% endblock %}

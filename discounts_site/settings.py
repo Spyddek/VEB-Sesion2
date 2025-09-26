@@ -33,8 +33,8 @@ ROOT_URLCONF = "discounts_site.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / "templates"],
-        "APP_DIRS": True,
+        "DIRS": [BASE_DIR / "templates"],  # ищет в test-vb-sesion2/templates
+        "APP_DIRS": True,  # ищет в discounts/templates
         "OPTIONS": {
             "context_processors": [
                 "django.template.context_processors.debug",

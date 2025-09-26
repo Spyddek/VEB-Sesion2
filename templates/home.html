@@ -1,47 +1,60 @@
 {% extends "base.html" %}
-{% load static %}
-
 {% block title %}Главная — Скидки{% endblock %}
-
 {% block content %}
-<h2>Популярные категории</h2>
-<div class="tags">
-  {% for c in popular_categories %}
-    <a href="#" class="tag">{{ c.name }}</a>
-  {% endfor %}
-</div>
 
-<h2>Топ-скидки</h2>
-<div class="cards">
-  {% for d in top_deals %}
-    <div class="card">
-      {% if d.image_url %}
-        <img src="{% static d.image_url %}" alt="{{ d.title }}">
-      {% else %}
-        <img src="{% static 'images/placeholder.jpg' %}" alt="No image">
-      {% endif %}
+<style>
+  a {
+    color: #000;
+    text-decoration: none;    /* убираем подчёркивание */
+  }
+  a:visited {
+    color: #000;              /* чтобы после клика оставался чёрным */
+  }
+  a:hover {
+    color: #333;              /* можно сделать чуть темнее/серее при наведении */
+  }
+  a:active, a:focus {
+    outline: none;            /* убираем рамку при клике/фокусе */
+    color: #000;
+  }
+</style>
 
-      <div class="card-body">
-        <h3>{{ d.title }}</h3>
-        <p>От {{ d.merchant.name }}</p>
-        <p class="price">
-          <span class="old">{{ d.price_original }} ₽</span>
-          <span class="new">{{ d.price_discount }} ₽</span>
-        </p>
-        <a href="#" class="btn">Подробнее</a>
-      </div>
-    </div>
-  {% endfor %}
-</div>
+<section>
+  <h2>Топ-скидки</h2>
+  <div class="grid">
+    {% for d in top_deals %}
+    <article class="card">
+      <img src="{{ d.image_url|default:'/static/images/placeholder.jpg' }}" alt="">
+      <h3><a href="{% url 'discounts:deal_detail' d.id %}">{{ d.title }}</a></h3>
+      <p><span class="badge">−{{ d.discount_pct|floatformat:0 }}%</span>
+         <span class="price">{{ d.price_discount }} ₽</span>
+         <span class="old-price">{{ d.price_original }} ₽</span></p>
+    </article>
+    {% empty %}<p>Нет активных акций.</p>{% endfor %}
+  </div>
+</section>
 
-<h2>Все акции</h2>
-<ul class="deal-list">
-  {% for d in ending_soon %}
-    <li>
-      <a href="#">
-        <b>{{ d.title }}</b> — до {{ d.expires_at|date:"d.m.Y" }}
-      </a>
-    </li>
-  {% endfor %}
-</ul>
+<section>
+  <h2>Скоро заканчиваются</h2>
+  <ol class="numbered">
+    {% for d in ending_soon %}
+      <li><a href="{% url 'discounts:deal_detail' d.id %}">{{ d.title }}</a>
+          <small class="muted">— до {{ d.expires_at|date:"d.m" }}</small></li>
+    {% endfor %}
+  </ol>
+  <p><a href="{% url 'discounts:search' %}?q=">Полный календарь окончаний</a></p>
+</section>
+
+<section>
+  <h2>Популярные категории</h2>
+  <div class="grid">
+    {% for c in cat_stats %}
+      <article class="card">
+        <a href="{% url 'discounts:category' c.id %}"><strong>{{ c.name }}</strong></a><br>
+        <small class="muted">Акций: {{ c.active_count|default:0 }}</small>
+      </article>
+    {% endfor %}
+  </div>
+</section>
+
 {% endblock %}

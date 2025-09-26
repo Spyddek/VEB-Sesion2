@@ -1,0 +1,32 @@
+
+{% extends "base.html" %}
+{% block title %}Категория — {{ category.name }}{% endblock %}
+{% block content %}
+<style>
+  a {
+    color: #000;
+    text-decoration: none;    /* убираем подчёркивание */
+  }
+  a:visited {
+    color: #000;              /* чтобы после клика оставался чёрным */
+  }
+  a:hover {
+    color: #333;              /* можно сделать чуть темнее/серее при наведении */
+  }
+  a:active, a:focus {
+    outline: none;            /* убираем рамку при клике/фокусе */
+    color: #000;
+  }
+</style>
+<h2>{{ category.name }}</h2>
+<div class="grid">
+  {% for d in deals %}
+    <article class="card">
+      <a href="{% url 'discounts:deal_detail' d.id %}"><strong>{{ d.title }}</strong></a><br>
+      <small class="muted">−{{ d.discount_pct|floatformat:0 }}% • до {{ d.expires_at|date:"d.m" }}</small>
+    </article>
+  {% empty %}
+    <p>Нет активных акций.</p>
+  {% endfor %}
+</div>
+{% endblock %}

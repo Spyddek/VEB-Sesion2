@@ -1,33 +1,64 @@
 {% extends "base.html" %}
-{% load static %}
-
+{% block title %}Поиск{% endblock %}
 {% block content %}
-<link rel="stylesheet" href="{% static 'css/search.css' %}">
-<h1>Поиск</h1>
 
-<form method="get">
-  <input type="text" name="q" value="{{ q }}" placeholder="Введите запрос">
-  <button type="submit">Найти</button>
-</form>
+<style>
+  a {
+    color: #000;
+    text-decoration: none;    /* убираем подчёркивание */
+  }
+  a:visited {
+    color: #000;              /* чтобы после клика оставался чёрным */
+  }
+  a:hover {
+    color: #333;              /* можно сделать чуть темнее/серее при наведении */
+  }
+  a:active, a:focus {
+    outline: none;            /* убираем рамку при клике/фокусе */
+    color: #000;
+  }
+</style>
+
+<h2>Результаты поиска{% if q %}: «{{ q }}»{% endif %}</h2>
 
 {% if q %}
-  <h2>Результаты поиска: "{{ q }}"</h2>
-  <ul>
-    {% for d in results %}
-      <li>
-        {% if d.image_url %}
-          <img src="{{ d.image_url }}" width="80">
-        {% else %}
-          <img src="{% static 'images/placeholder.jpg' %}" width="80">
-        {% endif %}
-        <b>{{ d.title }}</b> — {{ d.merchant.name }}  
-        Скидка: {{ d.discount_percent }}%
-      </li>
-    {% empty %}
-      <li>Ничего не найдено</li>
-    {% endfor %}
-  </ul>
+  
+  <h3>Акции</h3>
+  {% if deals %}
+    <ol class="numbered">
+      {% for d in deals %}
+        <li><a href="{% url 'discounts:deal_detail' d.id %}">{{ d.title }}</a>
+            <small class="muted"> (−{{ d.discount_pct|floatformat:0 }}%)</small></li>
+      {% endfor %}
+    </ol>
+  {% else %}
+    <p class="muted">Нет акций.</p>
+  {% endif %}
+
+  <h3>Магазины</h3>
+  {% if merchants %}
+    <ul>
+      {% for m in merchants %}
+        <li>{{ m.name }} <small class="muted">({{ m.contact }})</small></li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="muted">Нет магазинов.</p>
+  {% endif %}
+
+  <h3>Категории</h3>
+  {% if categories %}
+    <ul>
+      {% for c in categories %}
+        <li><a href="{% url 'discounts:category' c.id %}">{{ c.name }}</a></li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="muted">Нет категорий.</p>
+  {% endif %}
+
 {% else %}
-  <p>Введите текст для поиска.</p>
+  <p class="muted">Введите запрос вверху и нажмите «Найти».</p>
 {% endif %}
+
 {% endblock %}

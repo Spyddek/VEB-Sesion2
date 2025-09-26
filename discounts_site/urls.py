@@ -1,9 +1,12 @@
 from django.contrib import admin
-from django.urls import path
-from discounts.views import home, search
+from django.urls import path, include
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("", home, name="home"),
-    path("search/", search, name="search"),
+
+    # 🔑 стандартные Django auth урлы (login, logout, password reset и т.д.)
+    path("accounts/", include("django.contrib.auth.urls")),
+
+    # твое приложение discounts
+    path("", include("discounts.urls")),
 ]

@@ -1,7 +1,9 @@
 from django.db import models
+from django.conf import settings  # используем AUTH_USER_MODEL вместо прямого User
+
 
 class Role(models.Model):
-    name = models.CharField("Название роли", max_length=100, unique=True)
+    name = models.CharField("Роль", max_length=50, unique=True)
 
     class Meta:
         verbose_name = "Роль"
@@ -11,25 +13,14 @@ class Role(models.Model):
         return self.name
 
 
-class User(models.Model):
-    email = models.EmailField("Email", unique=True)
-    password_hash = models.CharField("Хэш пароля", max_length=255)
-    role = models.ForeignKey(Role, on_delete=models.CASCADE, verbose_name="Роль")
-    created_at = models.DateTimeField("Дата создания", auto_now_add=True)
-
-    class Meta:
-        verbose_name = "Пользователь"
-        verbose_name_plural = "Пользователи"
-
-    def __str__(self):
-        return self.email
-
-
 class Merchant(models.Model):
     name = models.CharField("Название партнёра", max_length=255)
-    contact = models.CharField("Контакты", max_length=255, blank=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Пользователь")
-    created_at = models.DateTimeField("Дата создания", auto_now_add=True)
+    contact = models.EmailField("Контактный email", blank=True, null=True)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        verbose_name="Пользователь"
+    )
 
     class Meta:
         verbose_name = "Партнёр"
@@ -40,7 +31,7 @@ class Merchant(models.Model):
 
 
 class Category(models.Model):
-    name = models.CharField("Название категории", max_length=100, unique=True)
+    name = models.CharField("Категория", max_length=100, unique=True)
 
     class Meta:
         verbose_name = "Категория"
@@ -69,10 +60,16 @@ class Deal(models.Model):
         return self.title
 
     def discount_percent(self):
+        """Вычисляем процент скидки"""
         if self.price_original and self.price_original > 0:
             return round(100 - (self.price_discount / self.price_original * 100), 2)
         return 0
     discount_percent.short_description = "Скидка (%)"
+
+    @property
+    def discount_pct(self):
+        """Алиас для шаблонов"""
+        return self.discount_percent()
 
 
 class DealCategory(models.Model):
@@ -94,7 +91,11 @@ class Coupon(models.Model):
         ("expired", "Истёк"),
     ]
     code = models.CharField("Код купона", max_length=50, unique=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Пользователь")
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        verbose_name="Пользователь"
+    )
     deal = models.ForeignKey(Deal, on_delete=models.CASCADE, verbose_name="Предложение")
     status = models.CharField("Статус", max_length=20, choices=STATUS_CHOICES, default="active")
     issued_at = models.DateTimeField("Дата выдачи", auto_now_add=True)

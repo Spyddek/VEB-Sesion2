@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+  <h2 class="text-xl font-bold mb-4">Результаты поиска: "{{ query }}"</h2>
+
+  {% if results %}
+    <ul>
+      {% for deal in results %}
+        <li class="border rounded p-2 mb-2 flex items-center">
+          {% if deal.image_url %}
+            <img src="{{ deal.image_url }}" alt="{{ deal.title }}" class="w-20 h-20 object-cover mr-4">
+          {% endif %}
+          <div>
+            <a href="#" class="text-lg font-semibold">{{ deal.title }}</a><br>
+            <span>Цена: {{ deal.price_discount }} ₽ (без скидки {{ deal.price_original }} ₽)</span>
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>Ничего не найдено.</p>
+  {% endif %}
+</div>
+{% endblock %}
