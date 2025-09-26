@@ -47,6 +47,6 @@ class CouponAdmin(admin.ModelAdmin):
     list_display = ("code", "id", "user", "deal", "status", "issued_at", "redeemed_at")
     list_filter = ("status", "issued_at", "redeemed_at")
     date_hierarchy = "issued_at"
-    search_fields = ("code", "user__username", "deal__title")  # ⚡ заменил email на username
+    search_fields = ("code", "user__username", "deal__title")
     raw_id_fields = ("user", "deal")
     readonly_fields = ("issued_at",)

@@ -156,3 +156,20 @@ def deal_delete(request, pk):
         return redirect("discounts:home")
 
     return render(request, "deal_confirm_delete.html", {"deal": deal})
+
+from .forms import DealForm
+
+def deal_create(request):
+    """Создание новой акции"""
+    if not request.user.is_staff:
+        return redirect("discounts:home")
+
+    if request.method == "POST":
+        form = DealForm(request.POST, request.FILES)
+        if form.is_valid():
+            deal = form.save()
+            return redirect("discounts:deal_detail", pk=deal.pk)
+    else:
+        form = DealForm()
+
+    return render(request, "deal_edit.html", {"form": form, "deal": None})

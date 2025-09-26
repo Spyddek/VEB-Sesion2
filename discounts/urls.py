@@ -13,4 +13,5 @@ urlpatterns = [
     path("signup/", views.signup, name="signup"),
     path("deal/<int:pk>/edit/", views.deal_edit, name="deal_edit"),
     path("deal/<int:pk>/delete/", views.deal_delete, name="deal_delete"),
+    path("deal/create/", views.deal_create, name="deal_create"),
 ]

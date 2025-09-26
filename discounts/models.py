@@ -1,5 +1,5 @@
 from django.db import models
-from django.conf import settings  # используем AUTH_USER_MODEL вместо прямого User
+from django.conf import settings
 
 
 class Role(models.Model):

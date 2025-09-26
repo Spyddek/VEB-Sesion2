@@ -12,10 +12,8 @@ class Command(BaseCommand):
         def get_image_url(i):
             return f"https://picsum.photos/seed/deal{i}/600/400"
 
-        # роли можно оставить, если используешь где-то ещё
         roles = [Role.objects.get_or_create(name=n)[0] for n in ["user", "partner", "admin"]]
 
-        # создаём пользователей
         users = []
         for i in range(1, 21):
             u, created = User.objects.get_or_create(
@@ -23,15 +21,21 @@ class Command(BaseCommand):
                 defaults={"email": f"user{i}@example.com"}
             )
             if created:
-                u.set_password("test12345")  # пароль по умолчанию
+                u.set_password("test12345")
                 u.save()
             users.append(u)
 
-        # создаём партнёров
+        partner_names = [
+            "М.Видео", "Эльдорадо", "DNS", "Ozon", "Wildberries",
+            "Lamoda", "Спортмастер", "Детский мир", "Л'Этуаль", "Рив Гош",
+            "IKEA", "Hoff", "Metro", "Ашан", "Перекрёсток",
+            "Магнит", "Пятёрочка", "Беру", "Aliexpress", "Яндекс Маркет"
+        ]
+
         partners = []
-        for i in range(1, 21):
+        for i, name in enumerate(partner_names, start=1):
             p, _ = Merchant.objects.get_or_create(
-                name=f"Partner {i}",
+                name=name,
                 defaults={
                     "contact": f"partner{i}@example.com",
                     "user": random.choice(users),
@@ -39,14 +43,12 @@ class Command(BaseCommand):
             )
             partners.append(p)
 
-        # категории
         category_names = [
             "Электроника", "Одежда", "Обувь", "Продукты", "Красота и здоровье",
             "Дом и сад", "Спорт", "Игрушки", "Авто", "Книги"
         ]
         cats = [Category.objects.get_or_create(name=name)[0] for name in category_names]
 
-        # возможные названия сделок по категориям
         deal_titles = {
             "Электроника": ["Скидка на смартфоны", "Уценка телевизоров", "Ноутбуки по акции"],
             "Одежда": ["Распродажа футболок", "Скидки на куртки", "Платья по суперцене"],
@@ -60,7 +62,6 @@ class Command(BaseCommand):
             "Книги": ["Бестселлеры по акции", "Учебники со скидкой", "Фэнтези по суперцене"],
         }
 
-        # создаём минимум 30 сделок
         deals = []
         now = timezone.now()
         for i in range(1, 31):
@@ -82,7 +83,6 @@ class Command(BaseCommand):
                     "image_url": image_url
                 }
             )
-            # основная категория + ещё одна
             DealCategory.objects.get_or_create(deal=d, category=cat)
             for c in random.sample(cats, k=1):
                 DealCategory.objects.get_or_create(deal=d, category=c)

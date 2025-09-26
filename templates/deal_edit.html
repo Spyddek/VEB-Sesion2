@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}
+  {% if deal %}Редактировать акцию{% else %}Создать акцию{% endif %}
+{% endblock %}
+{% block content %}
+
+<style>
+  form {
+    margin: 20px 0;
+  }
+  button, a.btn {
+    background: #555;
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    margin-right: 5px;
+  }
+  button:hover, a.btn:hover {
+    background: #333;
+  }
+</style>
+
+<article class="card card-wide">
+  <h2>
+    {% if deal %}Редактировать акцию: {{ deal.title }}{% else %}Создать новую акцию{% endif %}
+  </h2>
+
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    {{ form.non_field_errors }}
+
+    {% for field in form %}
+      <p>
+        {{ field.label_tag }} {{ field }}
+        {% if field.errors %}
+          <span style="color:red">{{ field.errors|join:", " }}</span>
+        {% endif %}
+      </p>
+    {% endfor %}
+
+    <button type="submit">💾 Сохранить</button>
+
+    {% if deal %}
+      <a class="btn" href="{% url 'discounts:deal_detail' deal.pk %}">↩ Отмена</a>
+    {% else %}
+      <a class="btn" href="{% url 'discounts:home' %}">↩ Отмена</a>
+    {% endif %}
+  </form>
+</article>
+
+{% endblock %}
