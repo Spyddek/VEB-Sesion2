@@ -123,3 +123,36 @@ def signup(request):
     else:
         form = UserCreationForm()
     return render(request, "signup.html", {"form": form})
+
+from .forms import DealForm
+
+def deal_edit(request, pk):
+    """Редактирование акции"""
+    deal = get_object_or_404(Deal, pk=pk)
+    
+    if not request.user.is_staff:
+        return redirect("discounts:deal_detail", pk=pk)
+
+    if request.method == "POST":
+        form = DealForm(request.POST, request.FILES, instance=deal)
+        if form.is_valid():
+            form.save()
+            return redirect("discounts:deal_detail", pk=deal.pk)
+    else:
+        form = DealForm(instance=deal)
+
+    return render(request, "deal_edit.html", {"form": form, "deal": deal})
+
+
+def deal_delete(request, pk):
+    """Удаление акции"""
+    deal = get_object_or_404(Deal, pk=pk)
+
+    if not request.user.is_staff:
+        return redirect("discounts:deal_detail", pk=pk)
+
+    if request.method == "POST":
+        deal.delete()
+        return redirect("discounts:home")
+
+    return render(request, "deal_confirm_delete.html", {"deal": deal})

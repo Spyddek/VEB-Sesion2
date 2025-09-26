@@ -10,5 +10,7 @@ urlpatterns = [
     path("deal/<int:pk>/", views.deal_detail, name="deal_detail"),
     path("deal/<int:pk>/favorite/", views.toggle_favorite, name="toggle_favorite"),
     path("favorites/", views.my_favorites, name="my_favorites"),
-    path("signup/", views.signup, name="signup"),  # регистрация
+    path("signup/", views.signup, name="signup"),
+    path("deal/<int:pk>/edit/", views.deal_edit, name="deal_edit"),
+    path("deal/<int:pk>/delete/", views.deal_delete, name="deal_delete"),
 ]
