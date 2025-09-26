@@ -60,7 +60,6 @@ class Deal(models.Model):
         return self.title
 
     def discount_percent(self):
-        """Вычисляем процент скидки"""
         if self.price_original and self.price_original > 0:
             return round(100 - (self.price_discount / self.price_original * 100), 2)
         return 0
@@ -68,7 +67,6 @@ class Deal(models.Model):
 
     @property
     def discount_pct(self):
-        """Алиас для шаблонов"""
         return self.discount_percent()
 
 
