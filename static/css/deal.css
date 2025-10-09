@@ -24,11 +24,11 @@
     width: 100%;
     height: 320px;
     object-fit: cover;
-    transition: transform 0.3s ease;
+    transition: none; /* без анимации */
 }
 
 .deal-image:hover img {
-    transform: scale(1.05);
+    transform: none; /* без увеличения */
 }
 
 .discount-badge {
@@ -87,24 +87,32 @@
     gap: 10px;
 }
 
-.btn {
+/* ----- Унифицированный стиль всех кнопок ----- */
+.btn,
+.btn-admin {
     display: inline-block;
     padding: 8px 14px;
     border-radius: 25px;
     text-decoration: none;
     font-size: 14px;
     font-weight: 600;
-    transition: background 0.2s ease, color 0.2s ease;
+    text-align: center;
+    cursor: pointer;
+    border: none;
+    transition: opacity 0.2s ease; /* одинаковый hover */
 }
 
-.btn-add {
+/* Цвета кнопок */
+.btn-add,
+.btn-admin.edit {
     background: #0077cc;
-    color: white;
+    color: #fff;
 }
 
-.btn-remove {
+.btn-remove,
+.btn-admin.delete {
     background: #dc3545;
-    color: white;
+    color: #fff;
 }
 
 .btn-secondary {
@@ -114,11 +122,14 @@
 
 .btn-login {
     background: #6c757d;
-    color: white;
+    color: #fff;
 }
 
-.btn:hover {
-    opacity: 0.9;
+/* ----- Единая анимация наведения для всех кнопок ----- */
+.btn:hover,
+.btn-admin:hover {
+    opacity: 0.85;
+    text-decoration: none;
 }
 
 /* ----- Описание ----- */
@@ -132,28 +143,6 @@
     display: flex;
     gap: 10px;
     margin-top: 10px;
-}
-
-.btn-admin {
-    display: inline-block;
-    padding: 6px 12px;
-    border-radius: 8px;
-    font-size: 13px;
-    text-decoration: none;
-    color: white;
-    transition: opacity 0.2s ease;
-}
-
-.btn-admin.edit {
-    background: #0077cc;
-}
-
-.btn-admin.delete {
-    background: #d32f2f;
-}
-
-.btn-admin:hover {
-    opacity: 0.85;
 }
 
 /* ----- Адаптивность ----- */
