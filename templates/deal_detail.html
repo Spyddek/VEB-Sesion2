@@ -1,73 +1,73 @@
 {% extends "base.html" %}
+{% load static %}
+
 {% block title %}{{ deal.title }} — Акция{% endblock %}
+
 {% block content %}
+<link rel="stylesheet" href="{% static 'css/deal.css' %}">
 
-<style>
-  a {
-    color: #000;
-    text-decoration: none;
-  }
-  a:visited {
-    color: #000;
-  }
-  a:hover {
-    color: #333;
-  }
-  a:active, a:focus {
-    outline: none;
-    color: #000;
-  }
+<article class="deal-card">
 
-  a.btn {
-    background: #555;
-    color: #fff;
-    padding: 6px 12px;
-    border-radius: 6px;
-    display: inline-block;
-    margin-right: 5px;
-  }
-  a.btn:hover {
-    background: #333;
-    color: #fff;
-  }
+  <!-- Изображение акции -->
+  <div class="deal-image">
+    <img src="{{ deal.image_url|default:'/static/images/placeholder.jpg' }}" alt="{{ deal.title }}">
+    <span class="discount-badge">−{{ deal.discount_pct|floatformat:0 }}%</span>
+  </div>
 
-  .strike {
-    text-decoration: line-through;
-  }
-</style>
+  <!-- Информация о товаре -->
+  <div class="deal-info">
+    <h2 class="deal-title">{{ deal.title }}</h2>
 
-<article class="card card-wide">
-  <img class="hero" src="{{ deal.image_url|default:'/static/images/placeholder.jpg' }}" alt="">
-  <h2>{{ deal.title }}</h2>
+    <!-- ✅ Порядок цен: сначала старая, потом новая -->
+    <div class="price-block">
+      <span class="old-price">{{ deal.price_original }} ₽</span>
+      <span class="new-price">{{ deal.price_discount }} ₽</span>
+    </div>
 
-  <p>
-    <span class="badge">−{{ deal.discount_pct|floatformat:0 }}%</span>
-    <strong>{{ deal.price_discount }} ₽</strong>
-    <span class="muted strike">{{ deal.price_original }} ₽</span>
-  </p>
-
-  <p class="muted">Действует до {{ deal.expires_at|date:"d.m.Y" }}</p>
-
-  <p>
-    {% if user.is_authenticated %}
-      {% if is_fav %}
-        <a class="btn" href="{% url 'discounts:toggle_favorite' deal.id %}">Убрать из избранного</a>
-      {% else %}
-        <a class="btn" href="{% url 'discounts:toggle_favorite' deal.id %}">☆ В избранное</a>
-      {% endif %}
-      <a class="btn" href="{% url 'discounts:my_favorites' %}">Мои избранные</a>
-    {% else %}
-      <a class="btn" href="{% url 'login' %}">Войдите, чтобы добавить в избранное</a>
-    {% endif %}
-  </p>
-
-  {% if user.is_staff %}
-    <hr>
-    <p>
-      <a class="btn" href="{% url 'discounts:deal_edit' deal.id %}">✎ Редактировать</a>
-      <a class="btn" href="{% url 'discounts:deal_delete' deal.id %}">🗑 Удалить</a>
+    <p class="deal-expire">
+      <i class="fa fa-calendar"></i>
+      Действует до {{ deal.expires_at|date:"d.m.Y" }}
     </p>
-  {% endif %}
-</article>
 
+    <!-- Кнопки действий -->
+    <div class="deal-actions">
+      {% if user.is_authenticated %}
+        {% if is_fav %}
+          <a class="btn btn-remove" href="{% url 'discounts:toggle_favorite' deal.id %}">
+            <i class="fa fa-heart"></i> Убрать из избранного
+          </a>
+        {% else %}
+          <a class="btn btn-add" href="{% url 'discounts:toggle_favorite' deal.id %}">
+            <i class="fa fa-heart-o"></i> В избранное
+          </a>
+        {% endif %}
+        <a class="btn btn-secondary" href="{% url 'discounts:my_favorites' %}">
+          <i class="fa fa-star"></i> Мои избранные
+        </a>
+      {% else %}
+        <a class="btn btn-login" href="{% url 'login' %}">
+          <i class="fa fa-user"></i> Войдите, чтобы добавить в избранное
+        </a>
+      {% endif %}
+    </div>
+
+    {% if deal.description %}
+      <hr>
+      <p class="deal-description">{{ deal.description }}</p>
+    {% endif %}
+
+    {% if user.is_staff %}
+      <hr>
+      <div class="admin-actions">
+        <a class="btn-admin edit" href="{% url 'discounts:deal_edit' deal.id %}">
+          <i class="fa fa-pencil"></i> Редактировать
+        </a>
+        <a class="btn-admin delete" href="{% url 'discounts:deal_delete' deal.id %}">
+          <i class="fa fa-trash"></i> Удалить
+        </a>
+      </div>
+    {% endif %}
+  </div>
+
+</article>
 {% endblock %}

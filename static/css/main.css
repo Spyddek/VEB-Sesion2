@@ -9,14 +9,16 @@ body {
 
 /* ----- Воздушная шапка ----- */
 header {
-    background-color: #ffffff;         /* белый фон */
-    border-bottom: 1px solid #dee2e6;  /* тонкая нижняя граница */
+    background-color: #ffffff;
+    border-bottom: 1px solid #dee2e6;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     position: sticky;
     top: 0;
     z-index: 1030;
     transition: background 0.3s ease, box-shadow 0.3s ease;
     padding: 12px 0;
+    display: flex;
+    justify-content: center;
 }
 
 header:hover {
@@ -39,34 +41,62 @@ header h1 a:hover {
     color: #0077cc;
 }
 
-/* ----- Горизонтальная структура и отступы ----- */
+/* ----- Контейнер внутри шапки ----- */
 header .container {
     display: flex;
-    align-items: center;               /* выравнивание по вертикали */
-    justify-content: space-between;    /* элементы по краям */
-    flex-wrap: wrap;                   /* адаптация на малых экранах */
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
     gap: 10px;
-    padding-left: 60px;                /* ✅ отступы по бокам */
-    padding-right: 60px;
+
+    width: 100%;
+    max-width: 1200px;
+    padding: 0 40px;
+    box-sizing: border-box;
 }
 
-/* ----- Центрируем форму поиска ----- */
+/* ----- Поиск (разделённый input и кнопка) ----- */
 header form {
     flex: 1;
     display: flex;
     justify-content: center;
+    align-items: center;
     max-width: 500px;
+    gap: 8px;
 }
 
 header form input {
     flex: 1;
+    border-radius: 25px;
+    border: 1px solid #ccc;
+    padding: 6px 14px;
+    font-size: 15px;
+    outline: none;
+    transition: all 0.2s ease;
+    background-color: #fff;
+}
+
+header form input:focus {
+    border-color: #0077cc;
+    box-shadow: 0 0 4px rgba(0, 119, 204, 0.3);
 }
 
 header form button {
+    border-radius: 25px;
+    background-color: #0077cc;
+    color: white;
+    border: none;
+    padding: 6px 20px;
+    font-size: 15px;
     white-space: nowrap;
+    transition: background 0.2s ease; /* ❌ убрали transform-анимацию */
 }
 
-/* ----- Навигация справа ----- */
+header form button:hover {
+    background-color: #005fa3;
+}
+
+/* ----- Навигация (вход / регистрация) ----- */
 header nav {
     display: flex;
     align-items: center;
@@ -81,7 +111,7 @@ header nav a {
     transition: color 0.2s ease;
 }
 
-/* Небольшая анимация подчёркивания */
+/* Эффект плавного подчёркивания */
 header nav a::after {
     content: "";
     position: absolute;
@@ -184,8 +214,7 @@ footer a:hover {
     header .container {
         flex-direction: column;
         align-items: center;
-        padding-left: 25px;  /* уменьшаем отступы на планшетах */
-        padding-right: 25px;
+        padding: 0 20px;
     }
 
     header form {
@@ -201,7 +230,16 @@ footer a:hover {
 
 @media (max-width: 600px) {
     header .container {
-        padding-left: 15px;  /* минимальные отступы на телефонах */
-        padding-right: 15px;
+        padding: 0 15px;
+    }
+
+    header form input,
+    header form button {
+        font-size: 14px;
+        padding: 6px 10px;
+    }
+
+    header h1 {
+        font-size: 20px;
     }
 }

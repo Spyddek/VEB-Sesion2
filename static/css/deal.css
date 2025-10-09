@@ -1,0 +1,177 @@
+/* ----- Общий стиль карточки акции ----- */
+.deal-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    max-width: 650px;
+    margin: 0 auto 40px auto;
+    transition: box-shadow 0.3s ease, transform 0.2s ease;
+}
+
+.deal-card:hover {
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
+    transform: translateY(-3px);
+}
+
+/* ----- Изображение ----- */
+.deal-image {
+    position: relative;
+    overflow: hidden;
+}
+
+.deal-image img {
+    width: 100%;
+    height: 320px;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.deal-image:hover img {
+    transform: scale(1.05);
+}
+
+.discount-badge {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    background: #dc3545;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 15px;
+}
+
+/* ----- Информация о товаре ----- */
+.deal-info {
+    padding: 20px 25px;
+}
+
+.deal-title {
+    font-size: 22px;
+    font-weight: 600;
+    margin: 0 0 10px 0;
+    color: #212529;
+}
+
+.price-block {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.new-price {
+    color: #d32f2f;
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.old-price {
+    color: #999;
+    text-decoration: line-through;
+    font-size: 16px;
+}
+
+.deal-expire {
+    color: #6c757d;
+    font-size: 15px;
+    margin-bottom: 15px;
+}
+
+/* ----- Кнопки действий ----- */
+.deal-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.btn {
+    display: inline-block;
+    padding: 8px 14px;
+    border-radius: 25px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.btn-add {
+    background: #0077cc;
+    color: white;
+}
+
+.btn-remove {
+    background: #dc3545;
+    color: white;
+}
+
+.btn-secondary {
+    background: #f1f3f5;
+    color: #333;
+}
+
+.btn-login {
+    background: #6c757d;
+    color: white;
+}
+
+.btn:hover {
+    opacity: 0.9;
+}
+
+/* ----- Описание ----- */
+.deal-description {
+    color: #333;
+    line-height: 1.5;
+}
+
+/* ----- Админ-кнопки ----- */
+.admin-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.btn-admin {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    text-decoration: none;
+    color: white;
+    transition: opacity 0.2s ease;
+}
+
+.btn-admin.edit {
+    background: #0077cc;
+}
+
+.btn-admin.delete {
+    background: #d32f2f;
+}
+
+.btn-admin:hover {
+    opacity: 0.85;
+}
+
+/* ----- Адаптивность ----- */
+@media (max-width: 768px) {
+    .deal-card {
+        max-width: 100%;
+        margin: 0 10px 30px 10px;
+    }
+
+    .deal-image img {
+        height: 220px;
+    }
+
+    .deal-title {
+        font-size: 20px;
+    }
+
+    .new-price {
+        font-size: 20px;
+    }
+}
