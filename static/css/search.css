@@ -14,20 +14,20 @@ input[type="text"] {
     max-width: 420px;
     padding: 8px 14px;
     border: 1px solid #ccc;
-    border-radius: 25px;
+    border-radius: 6px; /* 🔹 единое скругление */
     font-size: 15px;
-    color: #333;                      /* тёмно-серый текст */
+    color: #333;
     background-color: #fff;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
     box-sizing: border-box;
 }
 
 input[type="text"]::placeholder {
-    color: #6c757d;                   /* светло-серый плейсхолдер */
+    color: #6c757d;
 }
 
 input[type="text"]:focus {
-    border-color: #0077cc;            /* синий фокус */
+    border-color: #0077cc;
     box-shadow: 0 0 4px rgba(0, 119, 204, 0.3);
     outline: none;
 }
@@ -35,18 +35,19 @@ input[type="text"]:focus {
 /* ----- Кнопка поиска ----- */
 button {
     padding: 8px 20px;
-    background: #0077cc;              /* фирменный синий */
-    color: #fff;                      /* белый текст */
+    background: #0077cc;
+    color: #fff;
     border: none;
-    border-radius: 25px;              /* овальная форма */
+    border-radius: 6px; /* 🔹 заменено с 25px на 6px */
     cursor: pointer;
     font-weight: 600;
     font-size: 15px;
-    transition: background 0.2s ease;
+    transition: all 0.2s ease;
 }
 
 button:hover {
-    background: #005fa3;              /* немного темнее при наведении */
+    background: #005fa3;
+    transform: translateY(-1px); /* лёгкое поднятие */
 }
 
 /* ----- Список результатов поиска ----- */
@@ -65,7 +66,7 @@ ul li {
     padding: 12px 15px;
     margin-bottom: 12px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.08);
-    color: #212529;                   /* основной цвет текста */
+    color: #212529;
     transition: transform 0.1s ease, box-shadow 0.2s ease;
 }
 

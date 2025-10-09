@@ -29,13 +29,34 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Deal)
 class DealAdmin(admin.ModelAdmin):
-    list_display = ("id", "title", "merchant", "price_original", "price_discount", "get_discount_percent", "created_at")
-    list_filter = ("merchant", "categories", "created_at")
-    inlines = [DealCategoryInline]
+    list_display = (
+        "id",
+        "title",
+        "merchant",
+        "price_original",
+        "price_discount",
+        "get_discount_percent",
+        "created_at",
+    )
+    list_filter = ("merchant", "created_at")
+    inlines = [DealCategoryInline]  # ✅ категории редактируются через inline
     date_hierarchy = "created_at"
     search_fields = ("title",)
     raw_id_fields = ("merchant",)
     readonly_fields = ("created_at",)
+
+    # ✅ Поля для формы (без categories)
+    fields = (
+        "title",
+        "merchant",
+        "price_original",
+        "price_discount",
+        "starts_at",
+        "expires_at",
+        "image_url",
+        "description",   # 👈 наше новое поле
+        "favorited_by",
+    )
 
     @admin.display(description="Скидка (%)")
     def get_discount_percent(self, obj):

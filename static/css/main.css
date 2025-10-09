@@ -1,4 +1,4 @@
-/* ----- Общие стили страницы ----- */
+/* ----- Общие стили ----- */
 body {
     font-family: "Segoe UI", Arial, sans-serif;
     background-color: #f4f6f9;
@@ -7,7 +7,7 @@ body {
     padding: 0;
 }
 
-/* ----- Воздушная шапка ----- */
+/* ----- Шапка ----- */
 header {
     background-color: #ffffff;
     border-bottom: 1px solid #dee2e6;
@@ -17,8 +17,6 @@ header {
     z-index: 1030;
     transition: background 0.3s ease, box-shadow 0.3s ease;
     padding: 12px 0;
-    display: flex;
-    justify-content: center;
 }
 
 header:hover {
@@ -26,92 +24,94 @@ header:hover {
     box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
 }
 
-header h1 {
-    margin: 0;
-    font-size: 22px;
-    font-weight: 600;
-}
-
-header h1 a {
-    color: #212529;
-    text-decoration: none;
-}
-
-header h1 a:hover {
-    color: #0077cc;
-}
-
-/* ----- Контейнер внутри шапки ----- */
 header .container {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 10px;
-
-    width: 100%;
+    flex-wrap: nowrap;       /* 🔸 не переносим на большие экраны */
+    gap: 20px;
     max-width: 1200px;
     padding: 0 40px;
+    margin: 0 auto;
     box-sizing: border-box;
 }
 
-/* ----- Поиск (разделённый input и кнопка) ----- */
+header h1 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+header h1 a {
+    color: #000;
+    text-decoration: none;
+}
+
+header h1 a:hover {
+    color: #333;
+}
+
+/* ----- Поиск ----- */
 header form {
     flex: 1;
     display: flex;
-    justify-content: center;
     align-items: center;
     max-width: 500px;
+    min-width: 200px;
     gap: 8px;
 }
 
 header form input {
     flex: 1;
+    min-width: 0;
     border-radius: 25px;
     border: 1px solid #ccc;
     padding: 6px 14px;
     font-size: 15px;
     outline: none;
-    transition: all 0.2s ease;
     background-color: #fff;
+    transition: all 0.2s ease;
 }
 
 header form input:focus {
-    border-color: #0077cc;
-    box-shadow: 0 0 4px rgba(0, 119, 204, 0.3);
+    border-color: #000;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
 }
 
-header form button {
-    border-radius: 25px;
-    background-color: #0077cc;
-    color: white;
+.btn-search {
+    background-color: #000;
+    color: #fff;
     border: none;
-    padding: 6px 20px;
+    border-radius: 6px;
+    padding: 8px 20px;
     font-size: 15px;
-    white-space: nowrap;
-    transition: background 0.2s ease; /* ❌ убрали transform-анимацию */
+    font-weight: 600;
+    transition: all 0.2s ease;
+    cursor: pointer;
 }
 
-header form button:hover {
-    background-color: #005fa3;
+.btn-search:hover {
+    background-color: #333;
+    transform: translateY(-1px);
 }
 
-/* ----- Навигация (вход / регистрация) ----- */
+/* ----- Навигация ----- */
 header nav {
     display: flex;
     align-items: center;
     gap: 12px;
+    flex-shrink: 0;
 }
 
 header nav a {
-    color: #0077cc;
+    color: #000;
     text-decoration: none;
     font-weight: 500;
     position: relative;
     transition: color 0.2s ease;
 }
 
-/* Эффект плавного подчёркивания */
 header nav a::after {
     content: "";
     position: absolute;
@@ -119,71 +119,26 @@ header nav a::after {
     bottom: -3px;
     width: 0%;
     height: 2px;
-    background-color: #0077cc;
+    background-color: #000;
     transition: width 0.3s ease;
 }
 
 header nav a:hover {
-    color: #005fa3;
+    color: #333;
 }
 
 header nav a:hover::after {
     width: 100%;
 }
 
-/* ----- Основной контент ----- */
+/* ----- Контент ----- */
 main {
     padding: 20px;
     max-width: 1100px;
     margin: 0 auto;
 }
 
-h1, h2 {
-    color: #222;
-}
-
-/* ----- Элементы списков и карточек ----- */
-ul {
-    list-style: none;
-    padding: 0;
-}
-
-li {
-    background: #fff;
-    margin: 10px 0;
-    padding: 15px;
-    border-radius: 6px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-}
-
-li img {
-    margin-right: 15px;
-    border-radius: 6px;
-    width: 80px;
-    height: auto;
-    object-fit: cover;
-}
-
-/* ----- Кнопки ----- */
-.btn-custom {
-    display: inline-block;
-    background: #0077cc;
-    color: white;
-    padding: 8px 14px;
-    text-decoration: none;
-    border-radius: 4px;
-    font-size: 14px;
-    transition: background 0.2s ease;
-}
-
-.btn-custom:hover {
-    background: #005fa3;
-}
-
-/* ----- Современный футер ----- */
+/* ----- Футер ----- */
 footer {
     background-color: #f8f9fa;
     color: #6c757d;
@@ -199,47 +154,24 @@ footer:hover {
     background-color: #f1f3f5;
 }
 
-footer a {
-    color: #0077cc;
-    text-decoration: none;
-    font-weight: 500;
-}
-
-footer a:hover {
-    text-decoration: underline;
-}
-
 /* ----- Адаптивность ----- */
-@media (max-width: 992px) {
+@media (max-width: 768px) {
     header .container {
-        flex-direction: column;
-        align-items: center;
-        padding: 0 20px;
+        flex-wrap: wrap;               /* ✅ на мобильных перенос */
+        justify-content: center;
+        gap: 10px;
+    }
+
+    header h1 {
+        text-align: center;
     }
 
     header form {
         order: 3;
         width: 100%;
-        max-width: 100%;
     }
 
     header nav {
         order: 2;
-    }
-}
-
-@media (max-width: 600px) {
-    header .container {
-        padding: 0 15px;
-    }
-
-    header form input,
-    header form button {
-        font-size: 14px;
-        padding: 6px 10px;
-    }
-
-    header h1 {
-        font-size: 20px;
     }
 }

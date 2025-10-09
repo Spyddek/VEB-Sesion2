@@ -1,11 +1,11 @@
-/* ----- Общий стиль карточки акции ----- */
+/* ====== Макет страницы ====== */
 .deal-card {
     background: #fff;
     border-radius: 12px;
     box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
     overflow: hidden;
-    max-width: 650px;
-    margin: 0 auto 40px auto;
+    max-width: 750px;
+    margin: 40px auto;
     transition: box-shadow 0.3s ease, transform 0.2s ease;
 }
 
@@ -24,11 +24,6 @@
     width: 100%;
     height: 320px;
     object-fit: cover;
-    transition: none; /* без анимации */
-}
-
-.deal-image:hover img {
-    transform: none; /* без увеличения */
 }
 
 .discount-badge {
@@ -43,7 +38,7 @@
     font-size: 15px;
 }
 
-/* ----- Информация о товаре ----- */
+/* ----- Информация ----- */
 .deal-info {
     padding: 20px 25px;
 }
@@ -51,7 +46,7 @@
 .deal-title {
     font-size: 22px;
     font-weight: 600;
-    margin: 0 0 10px 0;
+    margin-bottom: 10px;
     color: #212529;
 }
 
@@ -85,39 +80,27 @@
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
+    margin-bottom: 15px;
 }
 
-/* ----- Унифицированный стиль всех кнопок ----- */
-.btn,
-.btn-admin {
-    display: inline-block;
-    padding: 8px 14px;
-    border-radius: 25px;
-    text-decoration: none;
-    font-size: 14px;
+/* ===== Кнопки ===== */
+.btn, .btn-admin {
+    border-radius: 6px;
     font-weight: 600;
-    text-align: center;
-    cursor: pointer;
+    text-decoration: none;
     border: none;
-    transition: opacity 0.2s ease; /* одинаковый hover */
+    padding: 8px 14px;
+    transition: opacity 0.2s ease, transform 0.1s ease;
 }
 
-/* Цвета кнопок */
-.btn-add,
-.btn-admin.edit {
+.btn-add, .btn-admin.edit {
     background: #0077cc;
     color: #fff;
 }
 
-.btn-remove,
-.btn-admin.delete {
+.btn-remove, .btn-admin.delete {
     background: #dc3545;
     color: #fff;
-}
-
-.btn-secondary {
-    background: #f1f3f5;
-    color: #333;
 }
 
 .btn-login {
@@ -125,42 +108,73 @@
     color: #fff;
 }
 
-/* ----- Единая анимация наведения для всех кнопок ----- */
-.btn:hover,
-.btn-admin:hover {
-    opacity: 0.85;
+a.btn, a.btn-admin {
+    color: #fff !important;
     text-decoration: none;
 }
 
-/* ----- Описание ----- */
+/* ===== Описание ===== */
 .deal-description {
     color: #333;
     line-height: 1.5;
 }
 
-/* ----- Админ-кнопки ----- */
-.admin-actions {
-    display: flex;
-    gap: 10px;
-    margin-top: 10px;
+/* ===== Модальное окно ===== */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
 }
 
-/* ----- Адаптивность ----- */
-@media (max-width: 768px) {
-    .deal-card {
-        max-width: 100%;
-        margin: 0 10px 30px 10px;
-    }
+.modal-content {
+    background: #fff;
+    margin: 5% auto;
+    padding: 20px 25px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 600px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
 
-    .deal-image img {
-        height: 220px;
-    }
+.modal-content label {
+    font-weight: 600;
+}
 
-    .deal-title {
-        font-size: 20px;
-    }
+.modal-content input,
+.modal-content textarea {
+    width: 100%;
+    margin: 6px 0 14px 0;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
 
-    .new-price {
-        font-size: 20px;
-    }
+.close {
+    float: right;
+    font-size: 24px;
+    font-weight: bold;
+    color: #999;
+    cursor: pointer;
+}
+
+.close:hover {
+    color: #000;
+}
+
+.deal-card,
+.deal-info,
+.deal-description,
+.deal-title {
+    word-wrap: break-word;          /* перенос длинных слов */
+    overflow-wrap: break-word;      /* перенос для современных браузеров */
+    white-space: normal;            /* обычное поведение строк */
+}
+
+.deal-card {
+    height: auto;
 }

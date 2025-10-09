@@ -1,7 +1,13 @@
 from django.db import models
 from django.conf import settings
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 
+# -------------------------------
+# 🔹 Роли пользователей
+# -------------------------------
 class Role(models.Model):
     name = models.CharField("Роль", max_length=50, unique=True)
 
@@ -13,6 +19,9 @@ class Role(models.Model):
         return self.name
 
 
+# -------------------------------
+# 🔹 Партнёры (магазины)
+# -------------------------------
 class Merchant(models.Model):
     name = models.CharField("Название партнёра", max_length=255)
     contact = models.EmailField("Контактный email", blank=True, null=True)
@@ -30,6 +39,9 @@ class Merchant(models.Model):
         return self.name
 
 
+# -------------------------------
+# 🔹 Категории
+# -------------------------------
 class Category(models.Model):
     name = models.CharField("Категория", max_length=100, unique=True)
 
@@ -41,6 +53,9 @@ class Category(models.Model):
         return self.name
 
 
+# -------------------------------
+# 🔹 Акции / Предложения
+# -------------------------------
 class Deal(models.Model):
     title = models.CharField("Название предложения", max_length=255)
     merchant = models.ForeignKey(Merchant, on_delete=models.CASCADE, verbose_name="Партнёр")
@@ -51,6 +66,15 @@ class Deal(models.Model):
     created_at = models.DateTimeField("Дата создания", auto_now_add=True)
     categories = models.ManyToManyField("Category", through="DealCategory", verbose_name="Категории")
     image_url = models.URLField("Картинка (URL)", blank=True, default="")
+    description = models.TextField("Описание продукта", blank=True, null=True)
+
+    # ✅ Добавлено поле для избранного
+    favorited_by = models.ManyToManyField(
+        User,
+        related_name="favorite_deals",
+        blank=True,
+        verbose_name="Добавили в избранное"
+    )
 
     class Meta:
         verbose_name = "Предложение"
@@ -59,17 +83,21 @@ class Deal(models.Model):
     def __str__(self):
         return self.title
 
+    # ✅ Автоматический расчёт и округление скидки
     def discount_percent(self):
+        """Возвращает целый процент скидки"""
         if self.price_original and self.price_original > 0:
-            return round(100 - (self.price_discount / self.price_original * 100), 2)
+            discount = 100 - (self.price_discount / self.price_original * 100)
+            return int(round(discount))  # округляем до целого
         return 0
-    discount_percent.short_description = "Скидка (%)"
 
     @property
     def discount_pct(self):
         return self.discount_percent()
 
-
+# -------------------------------
+# 🔹 Категории предложений (связка)
+# -------------------------------
 class DealCategory(models.Model):
     deal = models.ForeignKey(Deal, on_delete=models.CASCADE)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
@@ -82,6 +110,9 @@ class DealCategory(models.Model):
         return f"{self.deal} — {self.category}"
 
 
+# -------------------------------
+# 🔹 Купоны
+# -------------------------------
 class Coupon(models.Model):
     STATUS_CHOICES = [
         ("active", "Активен"),

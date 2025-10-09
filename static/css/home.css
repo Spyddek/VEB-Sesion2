@@ -1,21 +1,15 @@
-/* ----- Теги и категории ----- */
-.tags {
-    margin: 10px 0 20px 0;
-}
-.tag {
-    display: inline-block;
-    padding: 6px 12px;
-    margin: 5px;
-    background: #eef5ff;
-    border: 1px solid #0077cc;
-    border-radius: 20px;
+/* ----- Стили ссылок ----- */
+a {
+    color: #000;
     text-decoration: none;
-    color: #0077cc;
-    font-size: 14px;
 }
-.tag:hover {
-    background: #0077cc;
-    color: white;
+a:hover {
+    color: #333;
+}
+a:active,
+a:focus {
+    outline: none;
+    color: #000;
 }
 
 /* ----- Сетка карточек ----- */
@@ -28,7 +22,7 @@
     margin-top: 20px;
 }
 
-/* Адаптивность */
+/* ----- Адаптивность сетки ----- */
 @media (max-width: 1200px) {
     .cards {
         grid-template-columns: repeat(3, 1fr);
@@ -45,7 +39,7 @@
     }
 }
 
-/* ----- Карточка акции ----- */
+/* ----- Карточки акций ----- */
 .card {
     background: white;
     border: 1px solid #ddd;
@@ -91,37 +85,7 @@
     color: #d32f2f;
 }
 
-/* ----- Кнопки ----- */
-.btn {
-    display: inline-block;
-    background: #0077cc;
-    color: white;
-    padding: 6px 10px;
-    text-decoration: none;
-    border-radius: 4px;
-    font-size: 14px;
-    transition: background 0.2s ease;
-}
-.btn:hover {
-    background: #005fa3;
-}
-
-/* ----- Ссылки внутри карточек и списков (чёрные, без подчёркивания) ----- */
-.cards a,
-.cards a:link,
-.cards a:visited {
-    color: #000 !important;
-    text-decoration: none !important;
-    transition: color 0.2s ease;
-}
-.cards a:hover,
-.cards a:focus,
-.cards a:active {
-    color: #333 !important;
-    text-decoration: none !important;
-    outline: none;
-}
-
+/* ----- Список акций ----- */
 .deal-list {
     list-style: none;
     padding: 0;
@@ -129,16 +93,12 @@
 .deal-list li {
     margin: 8px 0;
 }
-.deal-list a,
-.deal-list a:link,
-.deal-list a:visited {
-    color: #000 !important;
-    text-decoration: none !important;
+.deal-list a {
+    color: #000;
+    text-decoration: none;
+    transition: color 0.2s ease;
 }
-.deal-list a:hover,
-.deal-list a:focus,
-.deal-list a:active {
-    color: #333 !important;
-    text-decoration: none !important;
-    outline: none;
+.deal-list a:hover {
+    color: #333;
+    text-decoration: none;
 }

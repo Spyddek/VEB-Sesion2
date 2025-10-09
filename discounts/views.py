@@ -3,12 +3,22 @@ from django.utils import timezone
 from django.db.models import Count, Q
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login as auth_login
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+import json
+from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import user_passes_test
+from decimal import Decimal
 
-from .models import Deal, Category, Coupon, Merchant
+from .models import Deal, Category, Merchant
+from .forms import DealForm
 
 
+# -------------------------------
+# 🔹 Главная страница
+# -------------------------------
 def home(request):
-    """Главная страница с тремя блоками"""
+    """Главная страница с блоками акций"""
     top_deals = sorted(
         Deal.objects.all(),
         key=lambda d: d.discount_percent(),
@@ -30,6 +40,9 @@ def home(request):
     })
 
 
+# -------------------------------
+# 🔹 Поиск
+# -------------------------------
 def search(request):
     """Поиск акций, магазинов и категорий"""
     q = request.GET.get("q", "").strip()
@@ -58,6 +71,9 @@ def search(request):
     })
 
 
+# -------------------------------
+# 🔹 Категория
+# -------------------------------
 def category(request, pk):
     """Страница категории с акциями"""
     category = get_object_or_404(Category, pk=pk)
@@ -68,12 +84,15 @@ def category(request, pk):
     })
 
 
+# -------------------------------
+# 🔹 Детальная страница акции
+# -------------------------------
 def deal_detail(request, pk):
     """Детальная страница акции"""
     deal = get_object_or_404(Deal, pk=pk)
     is_fav = False
     if request.user.is_authenticated:
-        is_fav = Coupon.objects.filter(user=request.user, deal=deal).exists()
+        is_fav = request.user in deal.favorited_by.all()
 
     return render(request, "deal_detail.html", {
         "deal": deal,
@@ -81,37 +100,32 @@ def deal_detail(request, pk):
     })
 
 
+# -------------------------------
+# 🔹 Избранное
+# -------------------------------
+@login_required
 def toggle_favorite(request, pk):
-    """Добавить/убрать акцию в избранное"""
-    if not request.user.is_authenticated:
-        return redirect("login")
-
+    """Добавить или убрать акцию из избранного"""
     deal = get_object_or_404(Deal, pk=pk)
-    coupon, created = Coupon.objects.get_or_create(
-        user=request.user,
-        deal=deal,
-        defaults={"status": "active"}
-    )
 
-    if not created:
-        coupon.delete()
+    if request.user in deal.favorited_by.all():
+        deal.favorited_by.remove(request.user)
+    else:
+        deal.favorited_by.add(request.user)
 
     return redirect("discounts:deal_detail", pk=deal.pk)
 
 
+@login_required
 def my_favorites(request):
-    """Избранные акции"""
-    if not request.user.is_authenticated:
-        return redirect("login")
-
-    coupons = Coupon.objects.filter(user=request.user, status="active")
-    deals = [c.deal for c in coupons]
-
-    return render(request, "favorites.html", {
-        "deals": deals,
-    })
+    """Список избранных акций"""
+    favorites = Deal.objects.filter(favorited_by=request.user)
+    return render(request, "favorites.html", {"favorites": favorites})
 
 
+# -------------------------------
+# 🔹 Регистрация пользователей
+# -------------------------------
 def signup(request):
     """Регистрация нового пользователя"""
     if request.method == "POST":
@@ -124,12 +138,15 @@ def signup(request):
         form = UserCreationForm()
     return render(request, "signup.html", {"form": form})
 
-from .forms import DealForm
 
+# -------------------------------
+# 🔹 Редактирование акции (форма)
+# -------------------------------
+@login_required
 def deal_edit(request, pk):
     """Редактирование акции"""
     deal = get_object_or_404(Deal, pk=pk)
-    
+
     if not request.user.is_staff:
         return redirect("discounts:deal_detail", pk=pk)
 
@@ -144,6 +161,10 @@ def deal_edit(request, pk):
     return render(request, "deal_edit.html", {"form": form, "deal": deal})
 
 
+# -------------------------------
+# 🔹 Удаление акции
+# -------------------------------
+@login_required
 def deal_delete(request, pk):
     """Удаление акции"""
     deal = get_object_or_404(Deal, pk=pk)
@@ -157,8 +178,11 @@ def deal_delete(request, pk):
 
     return render(request, "deal_confirm_delete.html", {"deal": deal})
 
-from .forms import DealForm
 
+# -------------------------------
+# 🔹 Создание новой акции
+# -------------------------------
+@login_required
 def deal_create(request):
     """Создание новой акции"""
     if not request.user.is_staff:
@@ -173,3 +197,45 @@ def deal_create(request):
         form = DealForm()
 
     return render(request, "deal_edit.html", {"form": form, "deal": None})
+
+
+# -------------------------------
+# 🔹 AJAX: обновление всех полей
+# -------------------------------
+@user_passes_test(lambda u: u.is_staff)
+@csrf_exempt
+def update_all(request, pk):
+    """AJAX-обновление полей акции (название, цены, дата, картинка, описание)"""
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            deal = Deal.objects.get(pk=pk)
+
+            deal.title = data.get('title', deal.title)
+
+            # 🧩 Безопасное преобразование цен
+            def safe_decimal(value, default):
+                try:
+                    return Decimal(str(value)) if str(value).strip() != "" else default
+                except Exception:
+                    return default
+
+            deal.price_original = safe_decimal(data.get('price_original'), deal.price_original)
+            deal.price_discount = safe_decimal(data.get('price_discount'), deal.price_discount)
+
+            # 🧩 Обновляем дату
+            expires = data.get('expires_at')
+            if expires:
+                deal.expires_at = expires
+
+            deal.image_url = data.get('image_url', deal.image_url)
+            deal.description = data.get('description', deal.description)
+
+            deal.save()
+            return JsonResponse({'status': 'ok'})
+
+        except Exception as e:
+            print("❌ Ошибка при обновлении:", e)
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+
+    return JsonResponse({'status': 'error'}, status=405)

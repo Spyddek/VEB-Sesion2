@@ -1,37 +1,10 @@
 {% extends "base.html" %}
+{% load static %}
+
 {% block title %}Главная — Скидки{% endblock %}
+
 {% block content %}
-
-<style>
-  /* Сохраняем стили ссылок (они у тебя были в шаблоне) */
-  a {
-    color: #000;
-    text-decoration: none;
-  }
-  a:visited {
-    color: #000;
-  }
-  a:hover {
-    color: #333;
-  }
-  a:active, a:focus {
-    outline: none;
-    color: #000;
-  }
-
-  a.btn {
-    background: #555;
-    color: #fff;
-    padding: 6px 12px;
-    border-radius: 6px;
-    display: inline-block;
-    margin-bottom: 15px;
-  }
-  a.btn:hover {
-    background: #333;
-    color: #fff;
-  }
-</style>
+<link rel="stylesheet" href="{% static 'css/home.css' %}">
 
 {% if user.is_staff %}
   <p>
@@ -41,17 +14,13 @@
 
 <section>
   <h2>Топ-скидки</h2>
-
-  <!-- ✅ Используем класс .cards, а не .grid -->
   <div class="cards">
     {% for d in top_deals %}
       <div class="card">
         <img src="{{ d.image_url|default:'/static/images/placeholder.jpg' }}" alt="{{ d.title }}">
         <div class="card-body">
           <h3>
-            <a href="{% url 'discounts:deal_detail' d.id %}">
-              {{ d.title }}
-            </a>
+            <a href="{% url 'discounts:deal_detail' d.id %}">{{ d.title }}</a>
           </h3>
           <p class="price">
             <span class="old">{{ d.price_original }} ₽</span>
@@ -71,9 +40,7 @@
   <ol class="deal-list">
     {% for d in ending_soon %}
       <li>
-        <a href="{% url 'discounts:deal_detail' d.id %}">
-          {{ d.title }}
-        </a>
+        <a href="{% url 'discounts:deal_detail' d.id %}">{{ d.title }}</a>
         <small class="muted">— до {{ d.expires_at|date:"d.m" }}</small>
       </li>
     {% empty %}
