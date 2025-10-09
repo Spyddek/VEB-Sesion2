@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Избранные акции{% endblock %}
+
+{% block content %}
+<h2 style="margin-bottom: 20px;">⭐ Мои избранные акции</h2>
+
+{% if favorites %}
+  <!-- Сетка карточек -->
+  <div class="cards">
+    {% for deal in favorites %}
+      <div class="card">
+        <img src="{{ deal.image_url|default:'/static/images/placeholder.jpg' }}" alt="{{ deal.title }}">
+        <div class="card-body">
+          <h3>
+            <a href="{% url 'discounts:deal_detail' deal.id %}">
+              {{ deal.title }}
+            </a>
+          </h3>
+
+          <p class="price">
+            <span class="old">{{ deal.price_original }} ₽</span>
+            <span class="new">{{ deal.price_discount }} ₽</span>
+          </p>
+
+          <div style="display: flex; gap: 6px;">
+            <a href="{% url 'discounts:deal_detail' deal.id %}" class="btn">Подробнее</a>
+            <a href="{% url 'discounts:toggle_favorite' deal.id %}" class="btn" style="background:#555;">
+              Удалить
+            </a>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <p class="text-muted">У вас пока нет избранных акций 💔</p>
+{% endif %}
+{% endblock %}
