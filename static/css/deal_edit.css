@@ -101,22 +101,3 @@ body {
 .card p {
     line-height: 1.4;
 }
-
-/* ======= Респонсив ======= */
-@media (max-width: 600px) {
-    .card {
-        padding: 20px;
-    }
-
-    button,
-    a.btn {
-        width: 100%;
-        text-align: center;
-        margin-top: 10px;
-    }
-}
-
-textarea {
-    min-height: 120px;
-    resize: vertical;
-}

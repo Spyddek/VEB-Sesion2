@@ -39,13 +39,12 @@ class DealAdmin(admin.ModelAdmin):
         "created_at",
     )
     list_filter = ("merchant", "created_at")
-    inlines = [DealCategoryInline]  # ✅ категории редактируются через inline
+    inlines = [DealCategoryInline]
     date_hierarchy = "created_at"
     search_fields = ("title",)
     raw_id_fields = ("merchant",)
     readonly_fields = ("created_at",)
 
-    # ✅ Поля для формы (без categories)
     fields = (
         "title",
         "merchant",
@@ -54,7 +53,7 @@ class DealAdmin(admin.ModelAdmin):
         "starts_at",
         "expires_at",
         "image_url",
-        "description",   # 👈 наше новое поле
+        "description",
         "favorited_by",
     )
 

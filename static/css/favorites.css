@@ -96,24 +96,13 @@
   background: #dc3545;
   color: #fff;
   cursor: pointer;
-  border: 2px solid #fff; /* ✅ белая обводка */
+  border: 2px solid #fff;
   transition: background 0.2s ease, border-color 0.2s ease;
 }
 
 .btn-delete:hover {
   background: #b52a38;
-  border-color: #f5f5f5; /* чуть светлее при наведении */
-}
-
-/* 📱 Адаптив */
-@media (max-width: 600px) {
-    .cards {
-        grid-template-columns: 1fr;
-    }
-
-    .card img {
-        height: 200px;
-    }
+  border-color: #f5f5f5;
 }
 
 .card {

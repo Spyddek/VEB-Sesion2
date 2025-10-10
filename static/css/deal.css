@@ -148,22 +148,3 @@ body {
   margin-bottom: 8px;
   color: #212529;
 }
-
-/* ====== Адаптивность ====== */
-@media (max-width: 600px) {
-  .deal-card {
-    margin: 20px 10px;
-  }
-  .deal-info {
-    padding: 15px;
-  }
-  .user-actions,
-  .admin-actions {
-    flex-direction: column;
-  }
-  .btn,
-  .btn-admin {
-    width: 100%;
-    text-align: center;
-  }
-}

@@ -1,11 +1,9 @@
-/* ===== Единый стиль кнопок для всего сайта ===== */
-
 .btn,
 button,
 .btn-admin {
     display: inline-block;
     padding: 8px 16px;
-    border-radius: 6px;            /* 🔹 единое скругление */
+    border-radius: 6px;
     text-decoration: none;
     font-size: 14px;
     font-weight: 600;

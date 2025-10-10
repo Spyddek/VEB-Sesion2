@@ -52,10 +52,6 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
-
-# -------------------------------
-# 🔹 Акции / Предложения
-# -------------------------------
 class Deal(models.Model):
     title = models.CharField("Название предложения", max_length=255)
     merchant = models.ForeignKey(Merchant, on_delete=models.CASCADE, verbose_name="Партнёр")
@@ -68,7 +64,6 @@ class Deal(models.Model):
     image_url = models.URLField("Картинка (URL)", blank=True, default="")
     description = models.TextField("Описание продукта", blank=True, null=True)
 
-    # ✅ Добавлено поле для избранного
     favorited_by = models.ManyToManyField(
         User,
         related_name="favorite_deals",
@@ -83,21 +78,17 @@ class Deal(models.Model):
     def __str__(self):
         return self.title
 
-    # ✅ Автоматический расчёт и округление скидки
     def discount_percent(self):
         """Возвращает целый процент скидки"""
         if self.price_original and self.price_original > 0:
             discount = 100 - (self.price_discount / self.price_original * 100)
-            return int(round(discount))  # округляем до целого
+            return int(round(discount))
         return 0
 
     @property
     def discount_pct(self):
         return self.discount_percent()
 
-# -------------------------------
-# 🔹 Категории предложений (связка)
-# -------------------------------
 class DealCategory(models.Model):
     deal = models.ForeignKey(Deal, on_delete=models.CASCADE)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
@@ -110,9 +101,6 @@ class DealCategory(models.Model):
         return f"{self.deal} — {self.category}"
 
 
-# -------------------------------
-# 🔹 Купоны
-# -------------------------------
 class Coupon(models.Model):
     STATUS_CHOICES = [
         ("active", "Активен"),

@@ -44,7 +44,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // csrf helper
   function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== "") {

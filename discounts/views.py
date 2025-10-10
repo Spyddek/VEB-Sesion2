@@ -14,9 +14,6 @@ from .models import Deal, Category, Merchant
 from .forms import DealForm
 
 
-# -------------------------------
-# 🔹 Главная страница
-# -------------------------------
 def home(request):
     """Главная страница с блоками акций"""
     top_deals = sorted(
@@ -40,9 +37,6 @@ def home(request):
     })
 
 
-# -------------------------------
-# 🔹 Поиск
-# -------------------------------
 def search(request):
     """Поиск акций, магазинов и категорий"""
     q = request.GET.get("q", "").strip()
@@ -71,9 +65,6 @@ def search(request):
     })
 
 
-# -------------------------------
-# 🔹 Категория
-# -------------------------------
 def category(request, pk):
     """Страница категории с акциями"""
     category = get_object_or_404(Category, pk=pk)
@@ -84,9 +75,6 @@ def category(request, pk):
     })
 
 
-# -------------------------------
-# 🔹 Детальная страница акции
-# -------------------------------
 def deal_detail(request, pk):
     """Детальная страница акции"""
     deal = get_object_or_404(Deal, pk=pk)
@@ -100,9 +88,6 @@ def deal_detail(request, pk):
     })
 
 
-# -------------------------------
-# 🔹 Избранное
-# -------------------------------
 @login_required
 def toggle_favorite(request, pk):
     """Добавить или убрать акцию из избранного"""
@@ -123,9 +108,6 @@ def my_favorites(request):
     return render(request, "favorites.html", {"favorites": favorites})
 
 
-# -------------------------------
-# 🔹 Регистрация пользователей
-# -------------------------------
 def signup(request):
     """Регистрация нового пользователя"""
     if request.method == "POST":
@@ -139,9 +121,6 @@ def signup(request):
     return render(request, "signup.html", {"form": form})
 
 
-# -------------------------------
-# 🔹 Редактирование акции (форма)
-# -------------------------------
 @login_required
 def deal_edit(request, pk):
     """Редактирование акции"""
@@ -161,9 +140,6 @@ def deal_edit(request, pk):
     return render(request, "deal_edit.html", {"form": form, "deal": deal})
 
 
-# -------------------------------
-# 🔹 Удаление акции
-# -------------------------------
 @login_required
 def deal_delete(request, pk):
     """Удаление акции"""
@@ -179,9 +155,6 @@ def deal_delete(request, pk):
     return render(request, "deal_confirm_delete.html", {"deal": deal})
 
 
-# -------------------------------
-# 🔹 Создание новой акции
-# -------------------------------
 @login_required
 def deal_create(request):
     """Создание новой акции"""
@@ -199,9 +172,6 @@ def deal_create(request):
     return render(request, "deal_edit.html", {"form": form, "deal": None})
 
 
-# -------------------------------
-# 🔹 AJAX: обновление всех полей
-# -------------------------------
 @user_passes_test(lambda u: u.is_staff)
 @csrf_exempt
 def update_all(request, pk):
@@ -213,7 +183,6 @@ def update_all(request, pk):
 
             deal.title = data.get('title', deal.title)
 
-            # 🧩 Безопасное преобразование цен
             def safe_decimal(value, default):
                 try:
                     return Decimal(str(value)) if str(value).strip() != "" else default
@@ -223,7 +192,6 @@ def update_all(request, pk):
             deal.price_original = safe_decimal(data.get('price_original'), deal.price_original)
             deal.price_discount = safe_decimal(data.get('price_discount'), deal.price_discount)
 
-            # 🧩 Обновляем дату
             expires = data.get('expires_at')
             if expires:
                 deal.expires_at = expires
@@ -247,7 +215,6 @@ def toggle_favorite(request, pk):
     """Добавить или убрать акцию из избранного"""
     deal = get_object_or_404(Deal, pk=pk)
 
-    # ✅ Работает и для GET, и для POST
     if request.method in ["POST", "GET"]:
         if request.user in deal.favorited_by.all():
             deal.favorited_by.remove(request.user)
@@ -256,11 +223,9 @@ def toggle_favorite(request, pk):
             deal.favorited_by.add(request.user)
             result = {"status": "added"}
 
-        # ✅ Если это AJAX, возвращаем JSON
         if request.headers.get("x-requested-with") == "XMLHttpRequest":
             return JsonResponse(result)
 
-        # ✅ Иначе просто возвращаем на предыдущую страницу
         referer = request.META.get("HTTP_REFERER")
         if referer:
             return redirect(referer)

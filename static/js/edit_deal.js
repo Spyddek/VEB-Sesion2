@@ -35,7 +35,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const updated = await response.json();
       modal.style.display = "none";
 
-      // Обновляем данные на странице без перезагрузки
+      // Обновление данных на странице без перезагрузки
       document.getElementById("deal-title").textContent = data.title;
       document.getElementById("deal-old").textContent = data.price_original + " ₽";
       document.getElementById("deal-new").textContent = data.price_discount + " ₽";
