@@ -239,3 +239,31 @@ def update_all(request, pk):
             return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
 
     return JsonResponse({'status': 'error'}, status=405)
+
+from django.http import JsonResponse
+
+@login_required
+def toggle_favorite(request, pk):
+    """Добавить или убрать акцию из избранного"""
+    deal = get_object_or_404(Deal, pk=pk)
+
+    # ✅ Работает и для GET, и для POST
+    if request.method in ["POST", "GET"]:
+        if request.user in deal.favorited_by.all():
+            deal.favorited_by.remove(request.user)
+            result = {"status": "removed"}
+        else:
+            deal.favorited_by.add(request.user)
+            result = {"status": "added"}
+
+        # ✅ Если это AJAX, возвращаем JSON
+        if request.headers.get("x-requested-with") == "XMLHttpRequest":
+            return JsonResponse(result)
+
+        # ✅ Иначе просто возвращаем на предыдущую страницу
+        referer = request.META.get("HTTP_REFERER")
+        if referer:
+            return redirect(referer)
+        return redirect("discounts:home")
+
+    return JsonResponse({"status": "error", "message": "Invalid method"}, status=405)

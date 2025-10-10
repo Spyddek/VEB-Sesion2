@@ -1,28 +1,12 @@
 {% extends "base.html" %}
+{% load static %}
+
 {% block title %}
   {% if deal %}Редактировать акцию{% else %}Создать акцию{% endif %}
 {% endblock %}
-{% block content %}
 
-<style>
-  form {
-    margin: 20px 0;
-  }
-  button, a.btn {
-    background: #555;
-    color: #fff;
-    padding: 6px 12px;
-    border-radius: 6px;
-    border: none;
-    cursor: pointer;
-    text-decoration: none;
-    display: inline-block;
-    margin-right: 5px;
-  }
-  button:hover, a.btn:hover {
-    background: #333;
-  }
-</style>
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/deal_edit.css' %}">
 
 <article class="card card-wide">
   <h2>

@@ -4,49 +4,38 @@
 {% block title %}Избранные акции{% endblock %}
 
 {% block extra_head %}
-    <!-- ✅ Подключаем стили только для этой страницы -->
-    <link href="{% static 'css/favorites.css' %}" rel="stylesheet">
+  <link href="{% static 'css/favorites.css' %}" rel="stylesheet">
 {% endblock %}
 
 {% block content %}
-<h2 style="margin-bottom: 20px;">⭐ Мои избранные акции</h2>
+<h2 style="margin-bottom: 20px;">Мои избранные акции</h2>
 
 {% if favorites %}
-  <!-- Сетка карточек -->
-  <div class="cards">
+  <div class="cards" id="favorites-container">
     {% for deal in favorites %}
-      <div class="card">
-        <!-- 🔹 Изображение акции -->
+      <div class="card" data-deal-id="{{ deal.id }}">
         <img src="{{ deal.image_url|default:'/static/images/placeholder.jpg' }}" alt="{{ deal.title }}">
 
-        <!-- 🔹 Контент карточки -->
         <div class="card-body">
-          <h3>
-            <a href="{% url 'discounts:deal_detail' deal.id %}">
-              {{ deal.title }}
-            </a>
-          </h3>
+          <!-- 🔹 Заголовок больше не кликабельный -->
+          <h3>{{ deal.title }}</h3>
 
-          <!-- 🔸 Цена -->
           <p class="price">
             <span class="old">{{ deal.price_original }} ₽</span>
             <span class="new">{{ deal.price_discount }} ₽</span>
           </p>
 
-          <!-- 🔸 Кнопки действий -->
           <div class="buttons">
-            <a href="{% url 'discounts:deal_detail' deal.id %}" class="btn-custom">
-              Подробнее
-            </a>
-            <a href="{% url 'discounts:toggle_favorite' deal.id %}" class="btn-custom btn-delete">
-              Удалить
-            </a>
+            <a href="{% url 'discounts:deal_detail' deal.id %}" class="btn-custom">Подробнее</a>
+            <button class="btn-custom btn-delete" data-id="{{ deal.id }}">Удалить</button>
           </div>
         </div>
       </div>
     {% endfor %}
   </div>
 {% else %}
-  <p class="text-muted">У вас пока нет избранных акций 💔</p>
+  <p class="text-muted" id="empty-message">У вас пока нет избранных акций</p>
 {% endif %}
+
+<script src="{% static 'js/favorites.js' %}"></script>
 {% endblock %}

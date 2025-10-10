@@ -93,11 +93,16 @@
 }
 
 .btn-delete {
-    background: #555;
+  background: #dc3545;
+  color: #fff;
+  cursor: pointer;
+  border: 2px solid #fff; /* ✅ белая обводка */
+  transition: background 0.2s ease, border-color 0.2s ease;
 }
 
 .btn-delete:hover {
-    background: #777;
+  background: #b52a38;
+  border-color: #f5f5f5; /* чуть светлее при наведении */
 }
 
 /* 📱 Адаптив */
@@ -109,4 +114,12 @@
     .card img {
         height: 200px;
     }
+}
+
+.card {
+  transition: box-shadow 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }

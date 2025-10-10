@@ -2,33 +2,17 @@
 {% block title %}Удалить акцию{% endblock %}
 {% block content %}
 
-<article class="card card-wide">
-  <h2>Удалить акцию «{{ deal.title }}»?</h2>
+<article class="card card-wide" style="max-width:600px;margin:50px auto;">
+  <h2>Вы уверены, что хотите удалить акцию?</h2>
 
-  <p>Эта операция <strong>безвозвратна</strong>. Вы уверены, что хотите удалить?</p>
+  <p><strong>{{ deal.title }}</strong></p>
+  <p>Это действие нельзя отменить.</p>
 
   <form method="post">
     {% csrf_token %}
-    <button type="submit" class="btn">🗑 Да, удалить</button>
+    <button type="submit" class="btn-admin delete">🗑 Удалить</button>
     <a href="{% url 'discounts:deal_detail' deal.pk %}" class="btn">↩ Отмена</a>
   </form>
 </article>
-
-<style>
-  button.btn, a.btn {
-    background: #555;
-    color: #fff;
-    padding: 6px 12px;
-    border-radius: 6px;
-    border: none;
-    cursor: pointer;
-    text-decoration: none;
-    display: inline-block;
-    margin-right: 5px;
-  }
-  button.btn:hover, a.btn:hover {
-    background: #333;
-  }
-</style>
 
 {% endblock %}

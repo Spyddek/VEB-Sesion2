@@ -8,88 +8,77 @@
 
 <article class="deal-card">
 
-  <!-- Изображение акции -->
+  <!-- 🔹 Изображение -->
   <div class="deal-image">
     <img id="deal-image" src="{{ deal.image_url|default:'/static/images/placeholder.jpg' }}" alt="{{ deal.title }}">
     <span class="discount-badge" id="discount-badge">−{{ deal.discount_pct|floatformat:0 }}%</span>
   </div>
 
-  <!-- Информация -->
+  <!-- 🔹 Информация -->
   <div class="deal-info">
     <h2 class="deal-title" id="deal-title">{{ deal.title }}</h2>
 
+    <!-- Цены -->
     <div class="price-block">
       <span class="old-price" id="deal-old">{{ deal.price_original }} ₽</span>
       <span class="new-price" id="deal-new">{{ deal.price_discount }} ₽</span>
     </div>
 
-    <p class="deal-expire" id="deal-expire">
-      <i class="fa fa-calendar"></i>
-      Действует до {{ deal.expires_at|date:"d.m.Y" }}
-    </p>
+    <!-- Дата окончания -->
+    {% if deal.expires_at %}
+      {% if deal.expires_at < now %}
+        <p class="deal-expire expired"><i class="fa fa-clock-o"></i> Акция завершена</p>
+      {% else %}
+        <p class="deal-expire"><i class="fa fa-calendar"></i> Действует до {{ deal.expires_at|date:"d.m.Y" }}</p>
+      {% endif %}
+    {% endif %}
 
+    <!-- 🔹 Кнопки действий -->
     <div class="deal-actions">
-      {% if user.is_authenticated %}
-        {% if is_fav %}
-          <a class="btn btn-remove" href="{% url 'discounts:toggle_favorite' deal.id %}">
-            <i class="fa fa-heart"></i> Убрать из избранного
-          </a>
+
+      <div class="user-actions">
+        {% if user.is_authenticated %}
+          {% if is_fav %}
+            <a class="btn btn-remove" href="{% url 'discounts:toggle_favorite' deal.id %}">
+              <i class="fa fa-heart"></i> Убрать из избранного
+            </a>
+          {% else %}
+            <a class="btn btn-add" href="{% url 'discounts:toggle_favorite' deal.id %}">
+              <i class="fa fa-heart-o"></i> В избранное
+            </a>
+          {% endif %}
         {% else %}
-          <a class="btn btn-add" href="{% url 'discounts:toggle_favorite' deal.id %}">
-            <i class="fa fa-heart-o"></i> В избранное
+          <a class="btn btn-login" href="{% url 'login' %}">
+            <i class="fa fa-user"></i> Войдите, чтобы добавить в избранное
           </a>
         {% endif %}
-      {% else %}
-        <a class="btn btn-login" href="{% url 'login' %}">
-          <i class="fa fa-user"></i> Войдите, чтобы добавить в избранное
-        </a>
-      {% endif %}
+      </div>
 
       {% if user.is_staff %}
-        <button class="btn-admin edit" id="edit-deal-btn">
-          <i class="fa fa-pencil"></i> Редактировать
-        </button>
+      <div class="admin-actions">
+        <a href="{% url 'discounts:deal_edit' deal.pk %}" class="btn-admin edit">
+          Редактировать
+        </a>
+        <a href="{% url 'discounts:deal_delete' deal.pk %}" class="btn-admin delete">
+          Удалить
+        </a>
+      </div>
       {% endif %}
     </div>
 
-    <!-- Описание -->
+    <!-- 🔹 Описание -->
     <div class="deal-description" id="description-text">
-      {% if deal.description %}
-        {{ deal.description }}
-      {% else %}
-        <em>Описание пока не добавлено.</em>
-      {% endif %}
+      <h3>Описание</h3>
+      <p>
+        {% if deal.description %}
+          {{ deal.description|linebreaks }}
+        {% else %}
+          <em>Описание пока не добавлено.</em>
+        {% endif %}
+      </p>
     </div>
   </div>
 </article>
-
-<!-- ===== Модальное окно ===== -->
-<div id="edit-modal" class="modal">
-  <div class="modal-content">
-    <span class="close">&times;</span>
-    <h3>Редактировать предложение</h3>
-
-    <label>Название:</label>
-    <input type="text" id="title-input" value="{{ deal.title }}">
-
-    <label>Цена без скидки:</label>
-    <input type="number" id="price-original-input" value="{{ deal.price_original }}">
-
-    <label>Цена со скидкой:</label>
-    <input type="number" id="price-discount-input" value="{{ deal.price_discount }}">
-
-    <label>Дата окончания:</label>
-    <input type="date" id="expires-at-input" value="{{ deal.expires_at|date:'Y-m-d' }}">
-
-    <label>Картинка (URL):</label>
-    <input type="text" id="image-url-input" value="{{ deal.image_url }}">
-
-    <label>Описание:</label>
-    <textarea id="desc-input">{{ deal.description }}</textarea>
-
-    <button id="save-deal-btn" class="btn-admin edit">💾 Сохранить изменения</button>
-  </div>
-</div>
 
 <script src="{% static 'js/edit_deal.js' %}"></script>
 {% endblock %}
