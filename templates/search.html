@@ -1,7 +1,13 @@
 {% extends "base.html" %}
-{% block title %}Поиск{% endblock %}
-{% block content %}
+{% load static %}
 
+{% block title %}Поиск{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/search.css' %}">
+{% endblock %}
+
+{% block content %}
 <h2>Результаты поиска{% if q %}: «{{ q }}»{% endif %}</h2>
 
 {% if q %}
@@ -22,7 +28,7 @@
   {% if merchants %}
     <ul>
       {% for m in merchants %}
-        <li>{{ m.name }} <small class="muted">({{ m.contact }})</small></li>
+        <li>{{ m.name }}</li>
       {% endfor %}
     </ul>
   {% else %}
@@ -43,5 +49,4 @@
 {% else %}
   <p class="muted">Введите запрос вверху и нажмите «Найти».</p>
 {% endif %}
-
 {% endblock %}

@@ -1,16 +1,27 @@
 {% extends "base.html" %}
-{% block title %}Категория — {{ category.name }}{% endblock %}
-{% block content %}
+{% load static %}
 
-<h2>{{ category.name }}</h2>
+{% block title %}Категория — {{ category.name }}{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/category.css' %}">
+
+<h2 class="page-title">{{ category.name }}</h2>
+
 <div class="grid">
   {% for d in deals %}
     <article class="card">
-      <a href="{% url 'discounts:deal_detail' d.id %}"><strong>{{ d.title }}</strong></a><br>
-      <small class="muted">−{{ d.discount_pct|floatformat:0 }}% • до {{ d.expires_at|date:"d.m" }}</small>
+      <a href="{% url 'discounts:deal_detail' d.id %}" class="card-link">
+        <strong class="deal-title">{{ d.title }}</strong>
+      </a>
+      <p class="deal-meta">
+        <span class="discount">−{{ d.discount_pct|floatformat:0 }}%</span>
+        <span class="dot">•</span>
+        <span class="expires">до {{ d.expires_at|date:"d.m" }}</span>
+      </p>
     </article>
   {% empty %}
-    <p>Нет активных акций.</p>
+    <p class="no-deals">Нет активных акций.</p>
   {% endfor %}
 </div>
 {% endblock %}

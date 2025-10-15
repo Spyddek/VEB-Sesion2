@@ -80,13 +80,15 @@ ul li img {
 }
 
 ul li a {
-    color: #0077cc;
+    color: #000;
     text-decoration: none;
     font-weight: 500;
+    transition: color 0.2s ease;
 }
 
 ul li a:hover {
-    text-decoration: underline;
+    color: #333;
+    text-decoration: none;
 }
 
 .result-details {
