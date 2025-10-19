@@ -59,6 +59,13 @@ header form {
     gap: 8px;
 }
 
+.header-search-placeholder {
+    flex: 1;
+    max-width: 500px;
+    min-width: 200px;
+    height: 40px;
+}
+
 header form input {
     flex: 1;
     min-width: 0;

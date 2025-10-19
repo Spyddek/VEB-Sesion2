@@ -31,6 +31,7 @@
         <a href="{% url 'discounts:home' %}">Скидки и спецпредложения</a>
       </h1>
 
+      {% block header_search %}
       <form action="{% url 'discounts:search' %}" method="get" role="search">
         <input
           name="q"
@@ -40,6 +41,7 @@
         >
         <button type="submit" class="btn-search">Найти</button>
       </form>
+      {% endblock %}
 
       <nav>
         {% if user.is_authenticated %}
