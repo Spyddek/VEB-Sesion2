@@ -3,63 +3,23 @@
 
 {% block title %}Поиск{% endblock %}
 
-{% block extra_head %}
-<link rel="stylesheet" href="{% static 'css/search.css' %}">
-{% endblock %}
-
 {% block content %}
-<h2>Результаты поиска{% if q %}: «{{ q }}»{% endif %}</h2>
+<h2>Поиск</h2>
 
-<form method="get" class="simple-search-form" role="search">
-  <input
-    type="text"
-    name="q"
-    placeholder="Введите запрос"
-    value="{{ q }}"
-    autocomplete="off"
-  >
-  <button type="submit">Найти</button>
+<form method="get">
+  <input type="text" name="q" value="{{ q }}" placeholder="Что ищем?">
+  <button type="submit">Искать</button>
 </form>
 
 {% if q %}
-
-  <h3>Акции</h3>
   {% if deals %}
-    <ol class="numbered">
-      {% for d in deals %}
-        <li>
-          <a href="{% url 'discounts:deal_detail' d.id %}">{{ d.title }}</a>
-          <small class="muted">(−{{ d.discount_pct|floatformat:0 }}%)</small>
-        </li>
-      {% endfor %}
-    </ol>
-  {% else %}
-    <p class="muted">Нет акций.</p>
-  {% endif %}
-
-  <h3>Магазины</h3>
-  {% if merchants %}
-    <ul class="plain-list">
-      {% for m in merchants %}
-        <li>{{ m.name }}{% if m.contact %} <small class="muted">— {{ m.contact }}</small>{% endif %}</li>
+    <ul>
+      {% for deal in deals %}
+        <li><a href="{% url 'discounts:deal_detail' deal.id %}">{{ deal.title }}</a></li>
       {% endfor %}
     </ul>
   {% else %}
-    <p class="muted">Нет магазинов.</p>
+    <p>Ничего не найдено.</p>
   {% endif %}
-
-  <h3>Категории</h3>
-  {% if categories %}
-    <ul class="plain-list">
-      {% for c in categories %}
-        <li><a href="{% url 'discounts:category' c.id %}">{{ c.name }}</a></li>
-      {% endfor %}
-    </ul>
-  {% else %}
-    <p class="muted">Нет категорий.</p>
-  {% endif %}
-
-{% else %}
-  <p class="muted">Введите запрос в поле выше и нажмите «Найти».</p>
 {% endif %}
 {% endblock %}

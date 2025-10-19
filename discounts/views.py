@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
-from django.db.models import Count, Q
+from django.db.models import Count
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login as auth_login
 from django.contrib.auth.decorators import login_required
@@ -9,7 +9,7 @@ import json
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import user_passes_test
 from decimal import Decimal
-from .models import Deal, Category, Merchant
+from .models import Deal, Category
 from .forms import DealForm
 
 
@@ -41,27 +41,13 @@ def search(request):
     q = request.GET.get("q", "").strip()
 
     deals = Deal.objects.none()
-    merchants = Merchant.objects.none()
-    categories = Category.objects.none()
 
     if q:
-        deals = Deal.objects.filter(
-            Q(title__icontains=q) | Q(description__icontains=q) | Q(merchant__name__icontains=q)
-        ).distinct()
-
-        merchants = Merchant.objects.filter(
-            Q(name__icontains=q) | Q(contact__icontains=q)
-        )
-
-        categories = Category.objects.filter(
-            name__icontains=q
-        )
+        deals = Deal.objects.filter(title__icontains=q)
 
     return render(request, "search.html", {
         "q": q,
         "deals": deals,
-        "merchants": merchants,
-        "categories": categories,
     })
 
 
