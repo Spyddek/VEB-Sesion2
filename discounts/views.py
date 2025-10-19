@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login as auth_login
 from django.contrib.auth.decorators import login_required
@@ -9,7 +9,7 @@ import json
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import user_passes_test
 from decimal import Decimal
-from .models import Deal, Category
+from .models import Deal, Category, Merchant
 from .forms import DealForm
 
 
@@ -41,14 +41,49 @@ def search(request):
     q = request.GET.get("q", "").strip()
 
     deals = Deal.objects.none()
+    merchants = Merchant.objects.none()
+    categories = Category.objects.none()
+
+    deals_count = merchants_count = categories_count = 0
 
     if q:
-        deals = Deal.objects.filter(title__icontains=q)
+        deals = (
+            Deal.objects.select_related("merchant")
+            .prefetch_related("categories")
+            .filter(
+                Q(title__icontains=q)
+                | Q(description__icontains=q)
+                | Q(merchant__name__icontains=q)
+                | Q(categories__name__icontains=q)
+            )
+            .distinct()
+            .order_by("-created_at")
+        )
+        merchants = Merchant.objects.filter(
+            Q(name__icontains=q) | Q(contact__icontains=q)
+        ).order_by("name")
+        categories = Category.objects.filter(name__icontains=q).order_by("name")
 
-    return render(request, "search.html", {
-        "q": q,
-        "deals": deals,
-    })
+        deals_count = deals.count()
+        merchants_count = merchants.count()
+        categories_count = categories.count()
+
+    total_count = deals_count + merchants_count + categories_count
+
+    return render(
+        request,
+        "search.html",
+        {
+            "q": q,
+            "deals": deals,
+            "merchants": merchants,
+            "categories": categories,
+            "deals_count": deals_count,
+            "merchants_count": merchants_count,
+            "categories_count": categories_count,
+            "total_count": total_count,
+        },
+    )
 
 
 def category(request, pk):
