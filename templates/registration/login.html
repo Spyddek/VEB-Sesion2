@@ -1,9 +1,34 @@
 {% extends "base.html" %}
+{% block title %}Вход{% endblock %}
 {% block content %}
-  <h2>Вход</h2>
-  <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Войти</button>
-  </form>
+  <section class="auth-card">
+    <h2>Вход</h2>
+    {% if form.non_field_errors %}
+      <div class="auth-error">
+        {% for error in form.non_field_errors %}
+          <p>{{ error }}</p>
+        {% endfor %}
+      </div>
+    {% endif %}
+    <form method="post" class="auth-form">
+      {% csrf_token %}
+      <div class="form-field">
+        <label for="{{ form.username.id_for_label }}">Логин</label>
+        {{ form.username }}
+        {% for error in form.username.errors %}
+          <span class="field-error">{{ error }}</span>
+        {% endfor %}
+      </div>
+      <div class="form-field">
+        <label for="{{ form.password.id_for_label }}">Пароль</label>
+        {{ form.password }}
+        {% for error in form.password.errors %}
+          <span class="field-error">{{ error }}</span>
+        {% endfor %}
+      </div>
+      <input type="hidden" name="next" value="{{ next|default:'' }}">
+      <button type="submit" class="auth-submit">Войти</button>
+    </form>
+    <p class="auth-alt">Нет аккаунта? <a href="{% url 'discounts:signup' %}">Зарегистрируйтесь</a>.</p>
+  </section>
 {% endblock %}
