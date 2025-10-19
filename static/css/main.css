@@ -50,7 +50,7 @@ header h1 a:hover {
     color: #333;
 }
 
-header form {
+.site-search-form {
     flex: 1;
     display: flex;
     align-items: center;
@@ -59,7 +59,14 @@ header form {
     gap: 8px;
 }
 
-header form input {
+.header-search-placeholder {
+    flex: 1;
+    max-width: 500px;
+    min-width: 200px;
+    height: 40px;
+}
+
+.site-search-form input {
     flex: 1;
     min-width: 0;
     border-radius: 25px;
@@ -71,7 +78,7 @@ header form input {
     transition: all 0.2s ease;
 }
 
-header form input:focus {
+.site-search-form input:focus {
     border-color: #000;
     box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
 }
@@ -127,6 +134,43 @@ header nav a:hover::after {
     width: 100%;
 }
 
+header nav .logout-form {
+    margin: 0;
+    display: flex;
+    align-items: center;
+}
+
+header nav .logout-form button {
+    background: none;
+    border: none;
+    color: #000;
+    font: inherit;
+    font-weight: 500;
+    padding: 0;
+    cursor: pointer;
+    position: relative;
+    transition: color 0.2s ease;
+}
+
+header nav .logout-form button::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -3px;
+    width: 0%;
+    height: 2px;
+    background-color: #000;
+    transition: width 0.3s ease;
+}
+
+header nav .logout-form button:hover {
+    color: #333;
+}
+
+header nav .logout-form button:hover::after {
+    width: 100%;
+}
+
 main {
     padding: 20px;
     max-width: 1100px;
@@ -141,4 +185,114 @@ footer {
     margin-top: 40px;
     border-top: 1px solid #dee2e6;
     font-size: 14px;
+}
+
+.auth-card {
+    max-width: 420px;
+    margin: 0 auto;
+    background-color: #fff;
+    border-radius: 16px;
+    padding: 32px;
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+}
+
+.auth-card h2 {
+    margin-top: 0;
+    margin-bottom: 18px;
+    font-size: 26px;
+    font-weight: 600;
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-field label {
+    font-weight: 500;
+    color: #1f2937;
+}
+
+.auth-form input[type="text"],
+.auth-form input[type="password"] {
+    border-radius: 10px;
+    border: 1px solid #cbd5f5;
+    padding: 10px 14px;
+    font-size: 15px;
+    transition: border 0.2s ease, box-shadow 0.2s ease;
+    width: 100%;
+    box-sizing: border-box;
+    background-color: #fff;
+}
+
+.auth-form input[type="text"]:focus,
+.auth-form input[type="password"]:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+    outline: none;
+}
+
+.auth-submit {
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #6366f1, #4338ca);
+    color: #fff;
+    padding: 12px 0;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.auth-submit:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 18px rgba(79, 70, 229, 0.25);
+}
+
+.auth-alt {
+    margin-top: 18px;
+    text-align: center;
+    color: #6b7280;
+}
+
+.auth-alt a {
+    color: #4338ca;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.auth-alt a:hover {
+    text-decoration: underline;
+}
+
+.auth-error {
+    background-color: #fee2e2;
+    border: 1px solid #fecaca;
+    color: #991b1b;
+    padding: 12px 16px;
+    border-radius: 10px;
+    margin-bottom: 18px;
+}
+
+.auth-error p {
+    margin: 0;
+}
+
+.field-error {
+    color: #dc2626;
+    font-size: 14px;
+}
+
+.field-help {
+    color: #6b7280;
+    font-size: 13px;
+    line-height: 1.5;
+    margin-top: 4px;
 }
