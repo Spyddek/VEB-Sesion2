@@ -8,213 +8,58 @@
 {% endblock %}
 
 {% block content %}
-<section class="search-hero">
-  <h2>Поиск по акциям и партнёрам</h2>
-  <form method="get" class="search-form" role="search">
-    <div class="query-row">
-      <input
-        type="search"
-        name="q"
-        placeholder="Например, доставка, спорт, электроника"
-        value="{{ q }}"
-        autocomplete="off"
-      >
-      <button type="submit">Найти</button>
-    </div>
+<h2>Результаты поиска{% if q %}: «{{ q }}»{% endif %}</h2>
 
-    <details class="filter-panel" {% if filters_active %}open{% endif %}>
-      <summary>Фильтры и сортировка</summary>
-      <div class="filters-body">
-        <div class="filter-section">
-          <span class="filter-title">Категории</span>
-          <div class="filter-options">
-            {% for cat in available_categories %}
-              <label class="checkbox-pill">
-                <input
-                  type="checkbox"
-                  name="category"
-                  value="{{ cat.id }}"
-                  {% if cat.id in selected_categories %}checked{% endif %}
-                  onchange="this.form.submit()"
-                >
-                <span>{{ cat.name }}{% if cat.total_deals %}<small>{{ cat.total_deals }}</small>{% endif %}</span>
-              </label>
-            {% empty %}
-              <p class="muted">Категории пока не добавлены.</p>
-            {% endfor %}
-          </div>
-        </div>
+<form method="get" class="simple-search-form" role="search">
+  <input
+    type="text"
+    name="q"
+    placeholder="Введите запрос"
+    value="{{ q }}"
+    autocomplete="off"
+  >
+  <button type="submit">Найти</button>
+</form>
 
-        <div class="filter-section">
-          <span class="filter-title">Сортировка</span>
-          <select name="sort" onchange="this.form.submit()">
-            <option value="relevance" {% if sort == 'relevance' %}selected{% endif %}>По релевантности</option>
-            <option value="discount" {% if sort == 'discount' %}selected{% endif %}>По размеру скидки</option>
-            <option value="new" {% if sort == 'new' %}selected{% endif %}>Сначала новые</option>
-          </select>
-        </div>
-      </div>
+{% if q %}
 
-      {% if filters_active %}
-        <a class="clear-filters" href="?q={{ q }}">Сбросить фильтры</a>
-      {% endif %}
-    </details>
-  </form>
-</section>
-
-{% if query_too_short %}
-  <p class="muted notice">Введите не менее двух символов, чтобы увидеть результаты.</p>
-{% elif show_results %}
-  <section class="results-summary">
-    <span>Акции: <strong>{{ deal_total }}</strong></span>
-    <span>Магазины: <strong>{{ merchant_total }}</strong></span>
-    <span>Категории: <strong>{{ category_total }}</strong></span>
-  </section>
-
-  {% if not deal_total and not merchant_total and not category_total %}
-    <p class="muted notice">Мы не нашли ничего по запросу «{{ q }}». Попробуйте изменить формулировку или убрать фильтры.</p>
+  <h3>Акции</h3>
+  {% if deals %}
+    <ol class="numbered">
+      {% for d in deals %}
+        <li>
+          <a href="{% url 'discounts:deal_detail' d.id %}">{{ d.title }}</a>
+          <small class="muted">(−{{ d.discount_pct|floatformat:0 }}%)</small>
+        </li>
+      {% endfor %}
+    </ol>
+  {% else %}
+    <p class="muted">Нет акций.</p>
   {% endif %}
 
-  <div class="results-grid">
-    <section class="results-primary">
-      <h3>Акции</h3>
-      {% if deal_total %}
-        <ol class="deal-list">
-          {% for d in deals %}
-            {% with deal_categories=d.categories.all %}
-            <li class="deal-card">
-              <div class="deal-header">
-                <a class="deal-title" href="{% url 'discounts:deal_detail' d.id %}">{{ d.title }}</a>
-                <span class="badge badge-accent">−{{ d.discount_rate|default:d.discount_pct|floatformat:0 }}%</span>
-              </div>
-              <div class="muted small">
-                {{ d.merchant.name }}{% if deal_categories %} · {{ deal_categories|join:", " }}{% endif %}
-              </div>
-              {% if d.description %}
-                <p class="muted excerpt">{{ d.description|truncatewords:28 }}</p>
-              {% endif %}
-            </li>
-            {% endwith %}
-          {% endfor %}
-        </ol>
+  <h3>Магазины</h3>
+  {% if merchants %}
+    <ul class="plain-list">
+      {% for m in merchants %}
+        <li>{{ m.name }}{% if m.contact %} <small class="muted">— {{ m.contact }}</small>{% endif %}</li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="muted">Нет магазинов.</p>
+  {% endif %}
 
-        {% if deals and deals.has_other_pages %}
-          <nav class="pagination" aria-label="Навигация по страницам">
-            {% if deals.has_previous %}
-              <a href="?q={{ q }}{% for cat_id in selected_categories %}&amp;category={{ cat_id }}{% endfor %}&amp;sort={{ sort }}&amp;page={{ deals.previous_page_number }}">← Назад</a>
-            {% else %}
-              <span class="disabled">← Назад</span>
-            {% endif %}
-
-            <span>Стр. {{ deals.number }} из {{ deals.paginator.num_pages }}</span>
-
-            {% if deals.has_next %}
-              <a href="?q={{ q }}{% for cat_id in selected_categories %}&amp;category={{ cat_id }}{% endfor %}&amp;sort={{ sort }}&amp;page={{ deals.next_page_number }}">Вперёд →</a>
-            {% else %}
-              <span class="disabled">Вперёд →</span>
-            {% endif %}
-          </nav>
-        {% endif %}
-      {% else %}
-        <p class="muted">Акции не найдены.</p>
-      {% endif %}
-    </section>
-
-    <aside class="results-side">
-      <div class="results-block">
-        <h3>Магазины</h3>
-        {% if merchant_total %}
-          <ul class="entity-list">
-            {% for m in merchants %}
-              <li>
-                <div class="entity-title">{{ m.name }}</div>
-                {% if m.contact %}<div class="muted small">{{ m.contact }}</div>{% endif %}
-                {% if m.deals_total %}<span class="badge">{{ m.deals_total }} акц.</span>{% endif %}
-              </li>
-            {% endfor %}
-          </ul>
-        {% else %}
-          <p class="muted">Магазины не найдены.</p>
-        {% endif %}
-      </div>
-
-      <div class="results-block">
-        <h3>Категории</h3>
-        {% if category_total %}
-          <ul class="entity-list">
-            {% for c in categories %}
-              <li>
-                <a class="entity-title" href="{% url 'discounts:category' c.id %}">{{ c.name }}</a>
-                {% if c.deals_total %}<span class="badge">{{ c.deals_total }} акц.</span>{% endif %}
-              </li>
-            {% endfor %}
-          </ul>
-        {% else %}
-          <p class="muted">Категории не найдены.</p>
-        {% endif %}
-      </div>
-    </aside>
-  </div>
-
-  {% if not deal_total and not merchant_total and not category_total and (recent_deals or popular_categories) %}
-    <section class="search-suggestions">
-      <h3>Попробуйте эти варианты</h3>
-      <div class="suggestions-grid">
-        <div>
-          <h4>Популярные категории</h4>
-          <ul class="tag-list">
-            {% for cat in popular_categories %}
-              <li><a href="{% url 'discounts:search' %}?q={{ cat.name }}">{{ cat.name }}</a></li>
-            {% empty %}
-              <li class="muted">Категории появятся позже.</li>
-            {% endfor %}
-          </ul>
-        </div>
-        <div>
-          <h4>Новые акции</h4>
-          <ul class="suggestion-deals">
-            {% for deal in recent_deals %}
-              <li>
-                <a href="{% url 'discounts:deal_detail' deal.id %}">{{ deal.title }}</a>
-                <span class="muted small">{{ deal.merchant.name }}</span>
-              </li>
-            {% empty %}
-              <li class="muted">Нет опубликованных акций.</li>
-            {% endfor %}
-          </ul>
-        </div>
-      </div>
-    </section>
+  <h3>Категории</h3>
+  {% if categories %}
+    <ul class="plain-list">
+      {% for c in categories %}
+        <li><a href="{% url 'discounts:category' c.id %}">{{ c.name }}</a></li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="muted">Нет категорий.</p>
   {% endif %}
 
 {% else %}
-  <section class="search-suggestions">
-    <h3>Не знаете, с чего начать?</h3>
-    <div class="suggestions-grid">
-      <div>
-        <h4>Популярные категории</h4>
-        <ul class="tag-list">
-          {% for cat in popular_categories %}
-            <li><a href="{% url 'discounts:search' %}?q={{ cat.name }}">{{ cat.name }}</a></li>
-          {% empty %}
-            <li class="muted">Категории появятся позже.</li>
-          {% endfor %}
-        </ul>
-      </div>
-      <div>
-        <h4>Новые акции</h4>
-        <ul class="suggestion-deals">
-          {% for deal in recent_deals %}
-            <li>
-              <a href="{% url 'discounts:deal_detail' deal.id %}">{{ deal.title }}</a>
-              <span class="muted small">{{ deal.merchant.name }}</span>
-            </li>
-          {% empty %}
-            <li class="muted">Нет опубликованных акций.</li>
-          {% endfor %}
-        </ul>
-      </div>
-    </div>
-  </section>
+  <p class="muted">Введите запрос в поле выше и нажмите «Найти».</p>
 {% endif %}
 {% endblock %}
