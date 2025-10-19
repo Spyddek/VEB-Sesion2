@@ -1,6 +1,16 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
-from django.db.models import Count, Q
+from django.db.models import (
+    Count,
+    Q,
+    Case,
+    When,
+    Value,
+    IntegerField,
+    F,
+    ExpressionWrapper,
+    FloatField,
+)
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login as auth_login
 from django.contrib.auth.decorators import login_required
@@ -9,6 +19,7 @@ import json
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import user_passes_test
 from decimal import Decimal
+from django.core.paginator import Paginator
 
 from .models import Deal, Category, Merchant
 from .forms import DealForm
@@ -38,31 +49,192 @@ def home(request):
 
 
 def search(request):
-    """Поиск акций, магазинов и категорий"""
+    """Продвинутый поиск по акциям, магазинам и категориям."""
     q = request.GET.get("q", "").strip()
-    deals, merchants, categories = [], [], []
+    sort = request.GET.get("sort", "relevance")
+    raw_selected_categories = request.GET.getlist("category")
 
-    if q:
-        deals = Deal.objects.filter(
-            Q(title__icontains=q) |
-            Q(merchant__name__icontains=q)
+    # Преобразуем выбранные категории к списку целых чисел, игнорируя некорректные значения
+    selected_categories = []
+    for value in raw_selected_categories:
+        try:
+            selected_categories.append(int(value))
+        except (TypeError, ValueError):
+            continue
+
+    selected_categories = list(dict.fromkeys(selected_categories))
+
+    deals_page = None
+    merchants = Merchant.objects.none()
+    categories = Category.objects.none()
+    deal_total = merchant_total = category_total = 0
+
+    query_too_short = bool(q) and len(q) < 2
+    show_results = bool(q) and not query_too_short
+
+    category_queryset = Category.objects.annotate(
+        total_deals=Count("deal", distinct=True)
+    )
+    available_categories = category_queryset.order_by("name")
+    popular_categories = category_queryset.order_by("-total_deals", "name")[:8]
+
+    recent_deals = (
+        Deal.objects.select_related("merchant")
+        .prefetch_related("categories")
+        .order_by("-created_at")[:6]
+    )
+
+    if show_results:
+        deal_filters = (
+            Q(title__icontains=q)
+            | Q(description__icontains=q)
+            | Q(merchant__name__icontains=q)
+            | Q(merchant__contact__icontains=q)
+            | Q(categories__name__icontains=q)
         )
 
-        merchants = Merchant.objects.filter(
-            Q(name__icontains=q) |
-            Q(contact__icontains=q)
+        discount_expression = Case(
+            When(
+                price_original__gt=0,
+                then=ExpressionWrapper(
+                    (F("price_original") - F("price_discount"))
+                    / F("price_original")
+                    * Decimal("100"),
+                    output_field=FloatField(),
+                ),
+            ),
+            default=Value(0.0),
+            output_field=FloatField(),
         )
 
-        categories = Category.objects.filter(
-            name__icontains=q
+        deal_qs = (
+            Deal.objects.select_related("merchant")
+            .prefetch_related("categories")
+            .filter(deal_filters)
         )
 
-    return render(request, "search.html", {
+        if selected_categories:
+            deal_qs = deal_qs.filter(categories__id__in=selected_categories)
+
+        deal_qs = (
+            deal_qs.annotate(
+                score_title_exact=Case(
+                    When(title__iexact=q, then=Value(8)),
+                    default=Value(0),
+                    output_field=IntegerField(),
+                ),
+                score_title_prefix=Case(
+                    When(title__istartswith=q, then=Value(5)),
+                    default=Value(0),
+                    output_field=IntegerField(),
+                ),
+                score_title_part=Case(
+                    When(title__icontains=q, then=Value(3)),
+                    default=Value(0),
+                    output_field=IntegerField(),
+                ),
+                score_description=Case(
+                    When(description__icontains=q, then=Value(1)),
+                    default=Value(0),
+                    output_field=IntegerField(),
+                ),
+                score_merchant=Case(
+                    When(merchant__name__icontains=q, then=Value(2)),
+                    default=Value(0),
+                    output_field=IntegerField(),
+                ),
+                score_category=Case(
+                    When(categories__name__icontains=q, then=Value(1)),
+                    default=Value(0),
+                    output_field=IntegerField(),
+                ),
+                discount_rate=discount_expression,
+            )
+            .annotate(
+                relevance=
+                F("score_title_exact")
+                + F("score_title_prefix")
+                + F("score_title_part")
+                + F("score_description")
+                + F("score_merchant")
+                + F("score_category")
+            )
+            .distinct()
+        )
+
+        if sort == "discount":
+            deal_qs = deal_qs.order_by("-discount_rate", "-relevance", "title")
+        elif sort == "new":
+            deal_qs = deal_qs.order_by("-created_at", "-relevance", "title")
+        else:
+            sort = "relevance"
+            deal_qs = deal_qs.order_by("-relevance", "title")
+
+        paginator = Paginator(deal_qs, 10)
+        deal_total = paginator.count
+
+        if deal_total:
+            page_number = request.GET.get("page")
+            deals_page = paginator.get_page(page_number)
+
+        merchants = (
+            Merchant.objects.filter(
+                Q(name__icontains=q) | Q(contact__icontains=q)
+            )
+            .annotate(
+                score_name_exact=Case(
+                    When(name__iexact=q, then=Value(4)),
+                    default=Value(0),
+                    output_field=IntegerField(),
+                ),
+                score_name_prefix=Case(
+                    When(name__istartswith=q, then=Value(2)),
+                    default=Value(0),
+                    output_field=IntegerField(),
+                ),
+                score_contact=Case(
+                    When(contact__icontains=q, then=Value(1)),
+                    default=Value(0),
+                    output_field=IntegerField(),
+                ),
+                deals_total=Count("deal", distinct=True),
+            )
+            .annotate(
+                relevance=
+                F("score_name_exact")
+                + F("score_name_prefix")
+                + F("score_contact")
+            )
+            .order_by("-relevance", "name")
+        )
+        merchant_total = merchants.count()
+
+        categories = (
+            Category.objects.filter(name__icontains=q)
+            .annotate(deals_total=Count("deal", distinct=True))
+            .order_by("name")
+        )
+        category_total = categories.count()
+
+    context = {
         "q": q,
-        "deals": deals,
+        "sort": sort,
+        "deals": deals_page,
         "merchants": merchants,
         "categories": categories,
-    })
+        "deal_total": deal_total,
+        "merchant_total": merchant_total,
+        "category_total": category_total,
+        "selected_categories": selected_categories,
+        "available_categories": available_categories,
+        "popular_categories": popular_categories,
+        "recent_deals": recent_deals,
+        "filters_active": bool(selected_categories),
+        "show_results": show_results,
+        "query_too_short": query_too_short,
+    }
+
+    return render(request, "search.html", context)
 
 
 def category(request, pk):
