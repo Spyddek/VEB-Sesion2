@@ -15,7 +15,7 @@
         <strong class="deal-title">{{ d.title }}</strong>
       </a>
       <p class="deal-meta">
-        <span class="discount">−{{ d.discount_pct|floatformat:0 }}%</span>
+        <span class="discount">{{ d.discount_pct|floatformat:0 }}%</span>
         <span class="dot">•</span>
         <span class="expires">до {{ d.expires_at|date:"d.m" }}</span>
       </p>
