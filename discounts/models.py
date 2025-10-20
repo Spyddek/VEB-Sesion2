@@ -4,10 +4,6 @@ from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
-
-# -------------------------------
-# 🔹 Роли пользователей
-# -------------------------------
 class Role(models.Model):
     name = models.CharField("Роль", max_length=50, unique=True)
 
@@ -18,10 +14,6 @@ class Role(models.Model):
     def __str__(self):
         return self.name
 
-
-# -------------------------------
-# 🔹 Партнёры (магазины)
-# -------------------------------
 class Merchant(models.Model):
     name = models.CharField("Название партнёра", max_length=255)
     contact = models.EmailField("Контактный email", blank=True, null=True)
@@ -38,10 +30,6 @@ class Merchant(models.Model):
     def __str__(self):
         return self.name
 
-
-# -------------------------------
-# 🔹 Категории
-# -------------------------------
 class Category(models.Model):
     name = models.CharField("Категория", max_length=100, unique=True)
 

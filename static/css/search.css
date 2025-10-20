@@ -258,17 +258,3 @@
     color: #fff;
     transform: translateY(-2px);
 }
-
-@media (max-width: 768px) {
-    .search-intro {
-        padding: 22px;
-    }
-
-    .search-intro h2 {
-        font-size: 24px;
-    }
-
-    .cards {
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    }
-}
