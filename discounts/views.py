@@ -9,6 +9,7 @@ import json
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import user_passes_test
 from decimal import Decimal
+import re
 from .models import Deal, Category, Merchant
 from .forms import DealForm
 
@@ -38,35 +39,43 @@ def home(request):
 
 def search(request):
     """Поиск акций, магазинов и категорий"""
-    q = request.GET.get("q", "").strip()
+    raw_query = request.GET.get("q", "")
+    q = re.sub(r"\s+", " ", raw_query).strip()
 
-    deals = Deal.objects.none()
-    merchants = Merchant.objects.none()
-    categories = Category.objects.none()
+    deals = []
+    merchants = []
+    categories = []
 
     deals_count = merchants_count = categories_count = 0
 
     if q:
-        deals = (
-            Deal.objects.select_related("merchant")
-            .prefetch_related("categories")
-            .filter(
-                Q(title__contains=q)
-                | Q(description__contains=q)
-                | Q(merchant__name__contains=q)
-                | Q(categories__name__contains=q)
-            )
-            .distinct()
-            .order_by("-created_at")
-        )
-        merchants = Merchant.objects.filter(
-            Q(name__contains=q) | Q(contact__contains=q)
-        ).order_by("name")
-        categories = Category.objects.filter(name__contains=q).order_by("name")
+        terms = [term for term in q.split(" ") if term]
 
-        deals_count = deals.count()
-        merchants_count = merchants.count()
-        categories_count = categories.count()
+        deal_filters = Deal.objects.select_related("merchant").prefetch_related("categories").distinct()
+        merchant_filters = Merchant.objects.all()
+        category_filters = Category.objects.all()
+
+        for term in terms:
+            term_condition = (
+                Q(title__icontains=term)
+                | Q(description__icontains=term)
+                | Q(merchant__name__icontains=term)
+                | Q(categories__name__icontains=term)
+            )
+            deal_filters = deal_filters.filter(term_condition)
+
+            merchant_condition = Q(name__icontains=term) | Q(contact__icontains=term)
+            merchant_filters = merchant_filters.filter(merchant_condition)
+
+            category_filters = category_filters.filter(name__icontains=term)
+
+        deals = list(deal_filters.order_by("-created_at"))
+        merchants = list(merchant_filters.order_by("name"))
+        categories = list(category_filters.order_by("name"))
+
+        deals_count = len(deals)
+        merchants_count = len(merchants)
+        categories_count = len(categories)
 
     total_count = deals_count + merchants_count + categories_count
 
