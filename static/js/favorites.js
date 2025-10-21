@@ -24,7 +24,6 @@ document.addEventListener("DOMContentLoaded", () => {
           card.style.transform = "scale(0.95)";
           setTimeout(() => card.remove(), 400);
 
-          // Проверяем, остались ли карточки
           setTimeout(() => {
             if (!container.querySelector(".card")) {
               container.innerHTML = "";
@@ -45,7 +44,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Получение CSRF токена из cookie
   function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== "") {

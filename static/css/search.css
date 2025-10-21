@@ -149,6 +149,7 @@
 
 .card-body h4 a:hover {
     color: #333;
+    text-decoration: none;
 }
 
 .card-body .merchant {
@@ -228,7 +229,6 @@
 
 .result-list .muted {
     color: #6c757d;
-    font-size: 14px;
 }
 
 .pill-list {

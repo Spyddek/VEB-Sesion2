@@ -9,6 +9,7 @@ import json
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import user_passes_test
 from decimal import Decimal
+
 from .models import Deal, Category, Merchant
 from .forms import DealForm
 
@@ -39,7 +40,6 @@ def home(request):
 def search(request):
     """Поиск акций, магазинов и категорий"""
     q = request.GET.get("q", "").strip()
-
     deals = Deal.objects.none()
     merchants = Merchant.objects.none()
     categories = Category.objects.none()
@@ -59,6 +59,7 @@ def search(request):
             .distinct()
             .order_by("-created_at")
         )
+        
         merchants = Merchant.objects.filter(
             Q(name__contains=q) | Q(contact__contains=q)
         ).order_by("name")
@@ -251,5 +252,3 @@ def toggle_favorite(request, pk):
         if referer:
             return redirect(referer)
         return redirect("discounts:home")
-
-    return JsonResponse({"status": "error", "message": "Invalid method"}, status=405)
