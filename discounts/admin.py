@@ -29,33 +29,14 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Deal)
 class DealAdmin(admin.ModelAdmin):
-    list_display = (
-        "id",
-        "title",
-        "merchant",
-        "price_original",
-        "price_discount",
-        "get_discount_percent",
-        "created_at",
-    )
+    list_display = ("id", "title", "merchant", "price_original", "price_discount", "get_discount_percent", "created_at")
     list_filter = ("merchant", "created_at")
     inlines = [DealCategoryInline]
     date_hierarchy = "created_at"
-    search_fields = ("title",)
-    raw_id_fields = ("merchant",)
-    readonly_fields = ("created_at",)
-
-    fields = (
-        "title",
-        "merchant",
-        "price_original",
-        "price_discount",
-        "starts_at",
-        "expires_at",
-        "image_url",
-        "description",
-        "favorited_by",
-    )
+    search_fields = ("title")
+    raw_id_fields = ("merchant")
+    readonly_fields = ("created_at")
+    fields = ("title", "merchant", "price_original", "price_discount", "starts_at", "expires_at", "image_url", "description", "favorited_by")
 
     @admin.display(description="Скидка (%)")
     def get_discount_percent(self, obj):

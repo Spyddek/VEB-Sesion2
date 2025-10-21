@@ -8,12 +8,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (!openBtn) return;
 
-  // открыть модалку
   openBtn.addEventListener("click", () => {
     modal.style.display = "block";
   });
 
-  // закрыть
   closeBtn.addEventListener("click", () => {
     modal.style.display = "none";
   });
@@ -22,7 +20,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (e.target === modal) modal.style.display = "none";
   });
 
-  // сохранить изменения
   saveBtn.addEventListener("click", async () => {
     const newText = textarea.value.trim();
     if (!newText) return alert("Описание не может быть пустым!");

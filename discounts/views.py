@@ -203,7 +203,7 @@ def update_all(request, pk):
             return JsonResponse({'status': 'ok'})
 
         except Exception as e:
-            print("❌ Ошибка при обновлении:", e)
+            print("Ошибка при обновлении:", e)
             return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
 
     return JsonResponse({'status': 'error'}, status=405)

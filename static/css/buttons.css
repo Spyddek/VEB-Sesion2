@@ -16,7 +16,6 @@ button,
     box-sizing: border-box;
 }
 
-/* Эффект наведения */
 .btn:hover,
 button:hover,
 .btn-admin:hover {
@@ -24,7 +23,6 @@ button:hover,
     transform: translateY(-1px);
 }
 
-/* Варианты */
 .btn-primary {
     color: #fff;
 }

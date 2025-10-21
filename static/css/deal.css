@@ -1,10 +1,8 @@
-/* ====== Общий фон ====== */
 body {
   background-color: #f8f9fa;
   font-family: "Segoe UI", Arial, sans-serif;
 }
 
-/* ====== Карточка ====== */
 .deal-card {
   background: #fff;
   border-radius: 12px;
@@ -19,7 +17,6 @@ body {
   transform: translateY(-3px);
 }
 
-/* ====== Изображение ====== */
 .deal-image {
   position: relative;
 }
@@ -42,7 +39,6 @@ body {
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
 }
 
-/* ====== Информация ====== */
 .deal-info {
   padding: 25px 30px;
 }
@@ -78,7 +74,6 @@ body {
   font-style: italic;
 }
 
-/* ====== Кнопки действий ====== */
 .deal-actions {
   display: flex;
   flex-direction: column;
@@ -96,7 +91,6 @@ body {
   padding-top: 12px;
 }
 
-/* ====== Кнопки ====== */
 .btn,
 .btn-admin {
   border-radius: 6px;
@@ -136,7 +130,6 @@ body {
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
 }
 
-/* ====== Описание ====== */
 .deal-description {
   margin-top: 20px;
   line-height: 1.6;

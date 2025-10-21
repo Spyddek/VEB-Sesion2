@@ -4,10 +4,6 @@ from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
-
-# -------------------------------
-# 🔹 Роли пользователей
-# -------------------------------
 class Role(models.Model):
     name = models.CharField("Роль", max_length=50, unique=True)
 
@@ -19,17 +15,10 @@ class Role(models.Model):
         return self.name
 
 
-# -------------------------------
-# 🔹 Партнёры (магазины)
-# -------------------------------
 class Merchant(models.Model):
     name = models.CharField("Название партнёра", max_length=255)
     contact = models.EmailField("Контактный email", blank=True, null=True)
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        verbose_name="Пользователь"
-    )
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name="Пользователь")
 
     class Meta:
         verbose_name = "Партнёр"
@@ -38,10 +27,6 @@ class Merchant(models.Model):
     def __str__(self):
         return self.name
 
-
-# -------------------------------
-# 🔹 Категории
-# -------------------------------
 class Category(models.Model):
     name = models.CharField("Категория", max_length=100, unique=True)
 
@@ -63,13 +48,7 @@ class Deal(models.Model):
     categories = models.ManyToManyField("Category", through="DealCategory", verbose_name="Категории")
     image_url = models.URLField("Картинка (URL)", blank=True, default="")
     description = models.TextField("Описание продукта", blank=True, null=True)
-
-    favorited_by = models.ManyToManyField(
-        User,
-        related_name="favorite_deals",
-        blank=True,
-        verbose_name="Добавили в избранное"
-    )
+    favorited_by = models.ManyToManyField(User, related_name="favorite_deals", blank=True, verbose_name="Добавили в избранное")
 
     class Meta:
         verbose_name = "Предложение"
@@ -102,17 +81,9 @@ class DealCategory(models.Model):
 
 
 class Coupon(models.Model):
-    STATUS_CHOICES = [
-        ("active", "Активен"),
-        ("redeemed", "Использован"),
-        ("expired", "Истёк"),
-    ]
+    STATUS_CHOICES = [("active", "Активен"), ("redeemed", "Использован"), ("expired", "Истёк")]
     code = models.CharField("Код купона", max_length=50, unique=True)
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        verbose_name="Пользователь"
-    )
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name="Пользователь")
     deal = models.ForeignKey(Deal, on_delete=models.CASCADE, verbose_name="Предложение")
     status = models.CharField("Статус", max_length=20, choices=STATUS_CHOICES, default="active")
     issued_at = models.DateTimeField("Дата выдачи", auto_now_add=True)

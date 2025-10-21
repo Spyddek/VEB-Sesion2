@@ -17,7 +17,7 @@
     <ol class="numbered">
       {% for d in deals %}
         <li><a href="{% url 'discounts:deal_detail' d.id %}">{{ d.title }}</a>
-            <small class="muted"> (−{{ d.discount_pct|floatformat:0 }}%)</small></li>
+            <small class="muted"> ({{ d.discount_pct|floatformat:0 }}%)</small></li>
       {% endfor %}
     </ol>
   {% else %}

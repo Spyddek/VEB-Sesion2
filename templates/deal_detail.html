@@ -8,23 +8,19 @@
 
 <article class="deal-card">
 
-  <!-- 🔹 Изображение -->
   <div class="deal-image">
     <img id="deal-image" src="{{ deal.image_url|default:'/static/images/placeholder.jpg' }}" alt="{{ deal.title }}">
-    <span class="discount-badge" id="discount-badge">−{{ deal.discount_pct|floatformat:0 }}%</span>
+    <span class="discount-badge" id="discount-badge">{{ deal.discount_pct|floatformat:0 }}%</span>
   </div>
 
-  <!-- 🔹 Информация -->
   <div class="deal-info">
     <h2 class="deal-title" id="deal-title">{{ deal.title }}</h2>
 
-    <!-- Цены -->
     <div class="price-block">
       <span class="old-price" id="deal-old">{{ deal.price_original }} ₽</span>
       <span class="new-price" id="deal-new">{{ deal.price_discount }} ₽</span>
     </div>
 
-    <!-- Дата окончания -->
     {% if deal.expires_at %}
       {% if deal.expires_at < now %}
         <p class="deal-expire expired"><i class="fa fa-clock-o"></i> Акция завершена</p>
@@ -33,7 +29,6 @@
       {% endif %}
     {% endif %}
 
-    <!-- 🔹 Кнопки действий -->
     <div class="deal-actions">
 
       <div class="user-actions">
@@ -66,7 +61,6 @@
       {% endif %}
     </div>
 
-    <!-- 🔹 Описание -->
     <div class="deal-description" id="description-text">
       <h3>Описание</h3>
       <p>
