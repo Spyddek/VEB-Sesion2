@@ -4,49 +4,113 @@
 {% block title %}Поиск{% endblock %}
 
 {% block extra_head %}
-<link rel="stylesheet" href="{% static 'css/search.css' %}">
+  <link href="{% static 'css/search.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block header_search %}
+  <div class="header-search-placeholder"></div>
 {% endblock %}
 
 {% block content %}
-<h2>Результаты поиска{% if q %}: «{{ q }}»{% endif %}</h2>
-
-{% if q %}
-  
-  <h3>Акции</h3>
-  {% if deals %}
-    <ol class="numbered">
-      {% for d in deals %}
-        <li><a href="{% url 'discounts:deal_detail' d.id %}">{{ d.title }}</a>
-            <small class="muted"> ({{ d.discount_pct|floatformat:0 }}%)</small></li>
-      {% endfor %}
-    </ol>
-  {% else %}
-    <p class="muted">Нет акций.</p>
+<section class="search-intro">
+  <h2>Поиск по сайту</h2>
+  <p class="muted">Введите запрос, чтобы найти подходящие акции, магазины или категории.</p>
+  <form method="get" class="search-form" role="search">
+    <input
+      type="text"
+      name="q"
+      value="{{ q }}"
+      placeholder="Например, кроссовки или электроника"
+      autocomplete="off"
+    >
+    <button type="submit">Найти</button>
+  </form>
+  {% if q %}
+    <p class="muted stats">Найдено результатов: {{ total_count }}.</p>
   {% endif %}
-
-  <h3>Магазины</h3>
-  {% if merchants %}
-    <ul>
-      {% for m in merchants %}
-        <li>{{ m.name }}</li>
-      {% endfor %}
-    </ul>
-  {% else %}
-    <p class="muted">Нет магазинов.</p>
-  {% endif %}
-
-  <h3>Категории</h3>
-  {% if categories %}
-    <ul>
-      {% for c in categories %}
-        <li><a href="{% url 'discounts:category' c.id %}">{{ c.name }}</a></li>
-      {% endfor %}
-    </ul>
-  {% else %}
-    <p class="muted">Нет категорий.</p>
-  {% endif %}
-
+</section>
+{% if not q %}
+  <div class="empty-state">
+    <h3>Начните с запроса</h3>
+    <p>Попробуйте ввести название товара, магазина или категории, чтобы увидеть предложения.</p>
+  </div>
 {% else %}
-  <p class="muted">Введите запрос вверху и нажмите «Найти».</p>
+  {% if total_count == 0 %}
+    <div class="empty-state">
+      <h3>Ничего не найдено</h3>
+      <p>Измените формулировку запроса или попробуйте другой термин.</p>
+    </div>
+  {% else %}
+    {% if deals_count %}
+      <section class="result-section">
+        <div class="section-header">
+          <h3>Акции</h3>
+          <span class="badge">{{ deals_count }}</span>
+        </div>
+        <div class="cards">
+          {% for deal in deals %}
+            <article class="card">
+              <img src="{{ deal.image_url|default:'/static/images/placeholder.jpg' }}" alt="{{ deal.title }}">
+              <div class="card-body">
+                <h4><a href="{% url 'discounts:deal_detail' deal.id %}">{{ deal.title }}</a></h4>
+                <p class="merchant">{{ deal.merchant.name }}</p>
+                {% if deal.description %}
+                  <p class="excerpt">{{ deal.description|truncatechars:120 }}</p>
+                {% endif %}
+                <p class="price">
+                  <span class="old">{{ deal.price_original }} ₽</span>
+                  <span class="new">{{ deal.price_discount }} ₽</span>
+                </p>
+                {% with deal.categories.all as deal_categories %}
+                  {% if deal_categories %}
+                    <ul class="tags">
+                      {% for category in deal_categories|slice:':3' %}
+                        <li>{{ category.name }}</li>
+                      {% endfor %}
+                      {% if deal_categories|length > 3 %}
+                        <li class="more">ещё {{ deal_categories|length|add:'-3' }}</li>
+                      {% endif %}
+                    </ul>
+                  {% endif %}
+                {% endwith %}
+              </div>
+            </article>
+          {% endfor %}
+        </div>
+      </section>
+    {% endif %}
+    {% if merchants_count %}
+      <section class="result-section">
+        <div class="section-header">
+          <h3>Магазины</h3>
+          <span class="badge">{{ merchants_count }}</span>
+        </div>
+        <ul class="result-list">
+          {% for merchant in merchants %}
+            <li>
+              <strong>{{ merchant.name }}</strong>
+              {% if merchant.contact %}
+                <span class="muted">— {{ merchant.contact }}</span>
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      </section>
+    {% endif %}
+
+    {% if categories_count %}
+      <section class="result-section">
+        <div class="section-header">
+          <h3>Категории</h3>
+          <span class="badge">{{ categories_count }}</span>
+        </div>
+        <ul class="pill-list">
+          {% for category in categories %}
+            <li><a href="{% url 'discounts:category' category.id %}">{{ category.name }}</a></li>
+          {% endfor %}
+        </ul>
+      </section>
+    {% endif %}
+  {% endif %}
 {% endif %}
 {% endblock %}

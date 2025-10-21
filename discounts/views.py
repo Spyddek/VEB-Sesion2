@@ -40,29 +40,51 @@ def home(request):
 def search(request):
     """Поиск акций, магазинов и категорий"""
     q = request.GET.get("q", "").strip()
-    deals, merchants, categories = [], [], []
+    deals = Deal.objects.none()
+    merchants = Merchant.objects.none()
+    categories = Category.objects.none()
+
+    deals_count = merchants_count = categories_count = 0
 
     if q:
-        deals = Deal.objects.filter(
-            Q(title__icontains=q) |
-            Q(merchant__name__icontains=q)
+        deals = (
+            Deal.objects.select_related("merchant")
+            .prefetch_related("categories")
+            .filter(
+                Q(title__contains=q)
+                | Q(description__contains=q)
+                | Q(merchant__name__contains=q)
+                | Q(categories__name__contains=q)
+            )
+            .distinct()
+            .order_by("-created_at")
         )
-
+        
         merchants = Merchant.objects.filter(
-            Q(name__icontains=q) |
-            Q(contact__icontains=q)
-        )
+            Q(name__contains=q) | Q(contact__contains=q)
+        ).order_by("name")
+        categories = Category.objects.filter(name__contains=q).order_by("name")
 
-        categories = Category.objects.filter(
-            name__icontains=q
-        )
+        deals_count = deals.count()
+        merchants_count = merchants.count()
+        categories_count = categories.count()
 
-    return render(request, "search.html", {
-        "q": q,
-        "deals": deals,
-        "merchants": merchants,
-        "categories": categories,
-    })
+    total_count = deals_count + merchants_count + categories_count
+
+    return render(
+        request,
+        "search.html",
+        {
+            "q": q,
+            "deals": deals,
+            "merchants": merchants,
+            "categories": categories,
+            "deals_count": deals_count,
+            "merchants_count": merchants_count,
+            "categories_count": categories_count,
+            "total_count": total_count,
+        },
+    )
 
 
 def category(request, pk):
@@ -203,7 +225,7 @@ def update_all(request, pk):
             return JsonResponse({'status': 'ok'})
 
         except Exception as e:
-            print("Ошибка при обновлении:", e)
+            print("❌ Ошибка при обновлении:", e)
             return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
 
     return JsonResponse({'status': 'error'}, status=405)
@@ -230,5 +252,3 @@ def toggle_favorite(request, pk):
         if referer:
             return redirect(referer)
         return redirect("discounts:home")
-
-    return JsonResponse({"status": "error", "message": "Invalid method"}, status=405)
