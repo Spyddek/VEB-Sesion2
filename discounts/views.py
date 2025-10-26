@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
-from django.db.models import Count, Q
+from django.db.models import Count
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login as auth_login
 from django.contrib.auth.decorators import login_required
@@ -15,7 +15,6 @@ from .forms import DealForm
 
 
 def home(request):
-    """Главная страница с блоками акций"""
     top_deals = sorted(
         Deal.objects.all(),
         key=lambda d: d.discount_percent(),
@@ -38,7 +37,6 @@ def home(request):
 
 
 def search(request):
-    """Поиск акций, магазинов и категорий"""
     q = request.GET.get("q", "").strip()
     deals = Deal.objects.none()
     merchants = Merchant.objects.none()
@@ -47,27 +45,56 @@ def search(request):
     deals_count = merchants_count = categories_count = 0
 
     if q:
-        deals = (
+        q_casefold = q.casefold()
+        
+        deals_queryset = (
             Deal.objects.select_related("merchant")
             .prefetch_related("categories")
-            .filter(
-                Q(title__contains=q)
-                | Q(description__contains=q)
-                | Q(merchant__name__contains=q)
-                | Q(categories__name__contains=q)
-            )
-            .distinct()
             .order_by("-created_at")
         )
         
-        merchants = Merchant.objects.filter(
-            Q(name__contains=q) | Q(contact__contains=q)
-        ).order_by("name")
-        categories = Category.objects.filter(name__contains=q).order_by("name")
+        deals = [
+            deal
+            for deal in deals_queryset
+            if (
+                q_casefold in deal.title.casefold()
+                or (
+                    deal.description
+                    and q_casefold in deal.description.casefold()
+                )
+                or q_casefold in deal.merchant.name.casefold()
+                or any(
+                    q_casefold in category.name.casefold()
+                    for category in deal.categories.all()
+                )
+            )
+        ]
 
-        deals_count = deals.count()
-        merchants_count = merchants.count()
-        categories_count = categories.count()
+        merchants_queryset = Merchant.objects.all()
+        merchants = [
+            merchant
+            for merchant in merchants_queryset
+            if (
+                q_casefold in merchant.name.casefold()
+                or (
+                    merchant.contact
+                    and q_casefold in merchant.contact.casefold()
+                )
+            )
+        ]
+        merchants.sort(key=lambda merchant: merchant.name)
+
+        categories_queryset = Category.objects.all()
+        categories = [
+            category
+            for category in categories_queryset
+            if q_casefold in category.name.casefold()
+        ]
+        categories.sort(key=lambda category: category.name)
+
+        deals_count = len(deals)
+        merchants_count = len(merchants)
+        categories_count = len(categories)
 
     total_count = deals_count + merchants_count + categories_count
 
@@ -88,7 +115,6 @@ def search(request):
 
 
 def category(request, pk):
-    """Страница категории с акциями"""
     category = get_object_or_404(Category, pk=pk)
     deals = Deal.objects.filter(categories=category)
     return render(request, "category.html", {
@@ -98,7 +124,6 @@ def category(request, pk):
 
 
 def deal_detail(request, pk):
-    """Детальная страница акции"""
     deal = get_object_or_404(Deal, pk=pk)
     is_fav = False
     if request.user.is_authenticated:
@@ -112,7 +137,6 @@ def deal_detail(request, pk):
 
 @login_required
 def toggle_favorite(request, pk):
-    """Добавить или убрать акцию из избранного"""
     deal = get_object_or_404(Deal, pk=pk)
 
     if request.user in deal.favorited_by.all():
@@ -125,13 +149,11 @@ def toggle_favorite(request, pk):
 
 @login_required
 def my_favorites(request):
-    """Список избранных акций"""
     favorites = Deal.objects.filter(favorited_by=request.user)
     return render(request, "favorites.html", {"favorites": favorites})
 
 
 def signup(request):
-    """Регистрация нового пользователя"""
     if request.method == "POST":
         form = UserCreationForm(request.POST)
         if form.is_valid():
@@ -145,7 +167,6 @@ def signup(request):
 
 @login_required
 def deal_edit(request, pk):
-    """Редактирование акции"""
     deal = get_object_or_404(Deal, pk=pk)
 
     if not request.user.is_staff:
@@ -164,7 +185,6 @@ def deal_edit(request, pk):
 
 @login_required
 def deal_delete(request, pk):
-    """Удаление акции"""
     deal = get_object_or_404(Deal, pk=pk)
 
     if not request.user.is_staff:
@@ -179,7 +199,6 @@ def deal_delete(request, pk):
 
 @login_required
 def deal_create(request):
-    """Создание новой акции"""
     if not request.user.is_staff:
         return redirect("discounts:home")
 
@@ -197,7 +216,6 @@ def deal_create(request):
 @user_passes_test(lambda u: u.is_staff)
 @csrf_exempt
 def update_all(request, pk):
-    """AJAX-обновление полей акции (название, цены, дата, картинка, описание)"""
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
@@ -225,7 +243,7 @@ def update_all(request, pk):
             return JsonResponse({'status': 'ok'})
 
         except Exception as e:
-            print("❌ Ошибка при обновлении:", e)
+            print("Ошибка при обновлении:", e)
             return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
 
     return JsonResponse({'status': 'error'}, status=405)
@@ -234,7 +252,6 @@ from django.http import JsonResponse
 
 @login_required
 def toggle_favorite(request, pk):
-    """Добавить или убрать акцию из избранного"""
     deal = get_object_or_404(Deal, pk=pk)
 
     if request.method in ["POST", "GET"]:

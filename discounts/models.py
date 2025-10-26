@@ -58,7 +58,6 @@ class Deal(models.Model):
         return self.title
 
     def discount_percent(self):
-        """Возвращает целый процент скидки"""
         if self.price_original and self.price_original > 0:
             discount = 100 - (self.price_discount / self.price_original * 100)
             return int(round(discount))
